@@ -62,13 +62,13 @@ namespace SqlBackupTest
         [Fact]
         public void BackupFiles_MockC_ShouldReturnOneFile()
         {
-            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\" } });
+            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"c:\backup\fullbak" } });
 
             var store = new BackupStore(GetServer(), GetFileSystem(), options);
 
             List<string> backupFiles = store.BackupFiles;
             backupFiles.Should().HaveCount(1);
-            backupFiles.Should().Contain(@"c:\backfile1.bak");
+            backupFiles.Should().Contain(@"c:\backup\fullbak\backfile1.bak");
         }
 
         [Fact]
@@ -126,6 +126,17 @@ namespace SqlBackupTest
             info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
             info.FirstLSN.Should().Be(37000000136800001M);
             info.LastLSN.Should().Be(37000000137100001M);
+            info.Position.Should().Be(1);
+            info.SoftwareVersionMajor.Should().Be(15);
+            info.Values.Count.Should().Be(56);
+            info = backupHeaders[3];
+            info.BackupType.Should().Be(BackupType.Log);
+            info.DatabaseName.Should().Be("Test");
+            info.BackupName.Should().Be("Test-Log Database Backup");
+            info.StartDate.Should().Be(new DateTime(2020, 8, 3, 12, 19, 56));
+            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 12, 19, 56));
+            info.FirstLSN.Should().Be(37000000019700001M);
+            info.LastLSN.Should().Be(37000000128700001M);
             info.Position.Should().Be(1);
             info.SoftwareVersionMajor.Should().Be(15);
             info.Values.Count.Should().Be(56);
@@ -216,7 +227,7 @@ namespace SqlBackupTest
         [Fact]
         public void GetFileNames_MockAllDirectories_ShouldReturnFiveFiles()
         {
-            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\", @"C:\Backup", @"C:\Backup\FULLBAK", @"C:\Backup\diffbak", @"C:\Backup\LogBak" } });
+            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\" } });
 
             var store = new BackupStore(GetServer(), GetFileSystem(), options);
 

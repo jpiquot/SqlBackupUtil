@@ -40,7 +40,7 @@ namespace SqlBackup.Database
         {
             1 => BackupType.Full,
             5 => BackupType.Differential,
-            3 => BackupType.Log,
+            2 => BackupType.Log,
             _ => BackupType.NotSupported
         };
     }

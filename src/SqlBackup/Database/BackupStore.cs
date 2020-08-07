@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 
@@ -23,6 +24,17 @@ namespace SqlBackup.Database
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _server = server ?? throw new ArgumentNullException(nameof(server));
+            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(_fileSystem));
+        }
+
+        public BackupStore(string serverName, IFileSystem fileSystem, IOptions<BackupStoreSettings> options)
+        {
+            if (string.IsNullOrWhiteSpace(serverName))
+            {
+                throw new ArgumentException(Properties.Resources.ArgumentIsNullOrWhitespace, nameof(serverName));
+            }
+            _server = new Server(serverName);
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(_fileSystem));
         }
 
@@ -69,18 +81,20 @@ namespace SqlBackup.Database
             var list = new List<string>();
             foreach (string path in _options.Value.BackupPaths)
             {
-                string[]? files = _fileSystem.Directory.GetFiles(path);
-                list.AddRange(files.Where(
-                    p => extensions
-                        .Contains(
-                            _fileSystem
-                                .Path
-                                .GetExtension(p)
-                                .ToUpperInvariant()
-                                .TrimStart('.')
-                                )
-                        )
-                    );
+                foreach (string extension in _options.Value.BackupFileExtensions)
+                {
+                    list.AddRange(_fileSystem
+                        .Directory
+                        .EnumerateFiles(
+                                path, 
+                                "*."+extension, 
+                                new EnumerationOptions 
+                                { 
+                                    RecurseSubdirectories = true, 
+                                    MatchType = MatchType.Simple, 
+                                    MatchCasing = MatchCasing.CaseInsensitive
+                                }));
+                }
             }
             return list;
         }
@@ -127,8 +141,8 @@ namespace SqlBackup.Database
                     lsn = headers.Where(p => p.StartDate < before).Max(p => p.LastLSN);
                 }
 
-                var diff = headers.Where(p => p.LastLSN == lsn).First();
-                var full = GetFullBackupHeaders(serverName, databaseName).Where(p => p.CheckpointLSN == diff.DatabaseBackupLSN).FirstOrDefault();
+                BackupHeader? diff = headers.Where(p => p.LastLSN == lsn).First();
+                BackupHeader? full = GetFullBackupHeaders(serverName, databaseName).Where(p => p.CheckpointLSN == diff.DatabaseBackupLSN).FirstOrDefault();
                 if (full == null)
                 {
                     throw new ApplicationException(string.Format(Properties.Resources.FullNotFoundForDiffBackup, diff.FileName));

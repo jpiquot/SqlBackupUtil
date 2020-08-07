@@ -61,6 +61,15 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument is null, empty or whitespaces..
+        /// </summary>
+        internal static string ArgumentIsNullOrWhitespace {
+            get {
+                return ResourceManager.GetString("ArgumentIsNullOrWhitespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No diff backup found from server &apos;%1&apos;, for database &apos;%2&apos;, before %3..
         /// </summary>
         internal static string DiffBackupNotFound {

@@ -6,14 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using NLog.Web;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Hosting;
+using System.CommandLine.Parsing;
+using System;
+using System.CommandLine.Invocation;
 
-namespace RestoreDatabase
+namespace SqlBackupUtil
 {
     internal class Program
     {
-        public static Task<IHostBuilder> CreateHostBuilder(string[] args)
+        public static Task<IHostBuilder> CreateHostBuilder(IHostBuilder builder, string[]? args)
         {
-            return Task.FromResult(new HostBuilder()
+            return Task.FromResult(builder
                         .UseConsoleLifetime()
                         .UseNLog()
                         .ConfigureHostConfiguration((config) =>
@@ -29,7 +35,7 @@ namespace RestoreDatabase
                         .ConfigureServices((hostContext, services) =>
                         {
                             // services.AddTransient<IDynamicsAXRepository, DynamicsAxRepository>();
-                            services.AddHostedService<RestoreWorker>();
+                            // services.AddHostedService<RestoreWorker>();
                             services.AddOptions();
                             // services.AddOptions<ActiveDirectorySettings>().Configure<IConfiguration>((o,
                             // c) => o.Update(c));
@@ -38,7 +44,7 @@ namespace RestoreDatabase
                         {
                             builder
                                 .SetBasePath(Directory.GetCurrentDirectory())
-                                .AddJsonFile("appsettings.json", optional: false)
+                                .AddJsonFile("appsettings.json", optional: true)
                                 .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
                                 .AddEnvironmentVariables()
                                 .AddEnvironmentVariables("ASPNETCORE_")
@@ -53,8 +59,15 @@ namespace RestoreDatabase
                         }));
         }
 
-        public static async Task Main(string[] args)
-                    => await (await CreateHostBuilder(args))
-                .RunConsoleAsync();
+        public static async Task Main(InvocationContext invocationContext,string[] args)
+        {
+            string[] arguments = args ?? Array.Empty<string>();
+            await Commands
+               .CreateBuilder(invocationContext)
+               .UseHost(_ => Host.CreateDefaultBuilder(), host => CreateHostBuilder(host, arguments))
+               .UseDefaults()
+               .Build()
+               .InvokeAsync(arguments);
+        }
     }
 }

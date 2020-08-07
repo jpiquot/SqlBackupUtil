@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SqlBackup": {
+      "commandName": "Project",
+      "commandLineArgs": "--test"
+    }
+  }
+}
