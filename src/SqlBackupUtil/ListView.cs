@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
 using System.Linq;
+using System.Reflection;
 
 using SqlBackup.Database;
 
@@ -17,14 +18,21 @@ namespace SqlBackupUtil
         /// Constructor
         /// </summary>
         /// <param name="backups">List of backup file headers</param>
-        /// <param name="directories">Directories where the files where searched.</param>
-        /// <param name="extensions">File extension filter</param>
-        public ListView(IEnumerable<BackupHeader> backups, IEnumerable<string> directories, IEnumerable<string> extensions)
+        /// <param name="options"></param>
+        public ListView(IEnumerable<BackupHeader> backups, ListOptions options)
         {
 
             Add(new ContentView("\n"));
-            Add(new ContentView(Span($"Backup directories: {string.Join("; ", directories).Rgb(235, 30, 180)}")));
-            Add(new ContentView(Span($"Backup extensions: {string.Join("; ", extensions).Rgb(235, 30, 180)}")));
+            Add(new ContentView(Span($"Sql backup utility V{Assembly.GetExecutingAssembly().GetName().Version}".Orange())));
+            Add(new ContentView(Span($"(c) Jérôme Piquot Fiveforty 2020".DarkOrange())));
+            Add(new ContentView("\n"));
+            Add(new ContentView(Span($"Backup directories:  {string.Join("; ", options.BackupDirectories).DarkGrey()}")));
+            Add(new ContentView(Span($"Backup extensions:   {string.Join("; ", options.BackupExtensions).DarkGrey()}")));
+            Add(new ContentView(Span($"Backup type:         {options.BackupType.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Source server:       {(options.SourceServer?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Source database:     {(options.SourceDatabase?? "All").DarkGrey()}")));
+            Add(new ContentView("\n"));
+            Add(new ContentView(Span($"Sql server:          {string.Join("; ", options.Server).DarkGrey()}")));
             Add(new ContentView("\n"));
 
             var tableView = new TableView<BackupHeader>();
@@ -72,15 +80,9 @@ namespace SqlBackupUtil
             Formatter.AddFormatter<DateTime>(d => $"{d:d} {ForegroundColorSpan.DarkGray()}{d:t}");
         }
 
-        TextSpan Span(FormattableString formattableString)
-        {
-            return Formatter.ParseToSpan(formattableString);
-        }
+        TextSpan Span(FormattableString formattableString) => Formatter.ParseToSpan(formattableString);
 
-        TextSpan Span(object obj)
-        {
-            return Formatter.Format(obj);
-        }
+        TextSpan Span(object obj) => Formatter.Format(obj);
 
         protected TextSpanFormatter Formatter { get; } = new TextSpanFormatter();
     }

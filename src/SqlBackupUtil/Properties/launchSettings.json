@@ -2,7 +2,7 @@
   "profiles": {
     "SqlBackupUtil": {
       "commandName": "Project",
-      "commandLineArgs": " [output:ansi] list --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak"
+      "commandLineArgs": " list --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak"
     }
   }
 }

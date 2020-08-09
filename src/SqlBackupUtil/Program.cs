@@ -64,8 +64,12 @@ namespace SqlBackupUtil
         {
             var consoleRenderer = new ConsoleRenderer(
                 invocationContext.Console,
-                OutputMode.Auto,
+                OutputMode.Ansi,
                 true);
+            if (invocationContext.Console is ITerminal terminal)
+            {
+                terminal.Clear();
+            }
             string[] arguments = args ?? Array.Empty<string>();
             await Commands
                .CreateBuilder(invocationContext, consoleRenderer)

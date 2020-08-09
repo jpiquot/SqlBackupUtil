@@ -55,19 +55,9 @@ namespace SqlBackupUtil
                     _ => null
                 });
  
-            var list = new ListView(backups, settings.BackupPaths, settings.BackupFileExtensions);
-            var console = _invocationContext.Console;
-            if (console is ITerminal terminal)
-            {
-                terminal.Clear();
-            }
-
-            var consoleRenderer = new ConsoleRenderer(
-                console,
-                mode: OutputMode.Auto,
-                resetAfterRender: true);
-
-            var screen = new ScreenView(consoleRenderer, _invocationContext.Console) { Child = list };
+            var list = new ListView(backups, _options);
+ 
+            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
             screen.Render();
         }
     }

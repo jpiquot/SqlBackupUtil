@@ -3,5 +3,6 @@
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
+		<Version>0.1.0-preview</Version>
 	</PropertyGroup>
 </Project>
