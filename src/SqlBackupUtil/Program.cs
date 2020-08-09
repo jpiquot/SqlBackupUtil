@@ -12,6 +12,7 @@ using System.CommandLine.Hosting;
 using System.CommandLine.Parsing;
 using System;
 using System.CommandLine.Invocation;
+using System.CommandLine.Rendering;
 
 namespace SqlBackupUtil
 {
@@ -59,11 +60,15 @@ namespace SqlBackupUtil
                         }));
         }
 
-        public static async Task Main(InvocationContext invocationContext,string[] args)
+        public static async Task Main(InvocationContext invocationContext, string[] args)
         {
+            var consoleRenderer = new ConsoleRenderer(
+                invocationContext.Console,
+                OutputMode.Auto,
+                true);
             string[] arguments = args ?? Array.Empty<string>();
             await Commands
-               .CreateBuilder(invocationContext)
+               .CreateBuilder(invocationContext, consoleRenderer)
                .UseHost(_ => Host.CreateDefaultBuilder(), host => CreateHostBuilder(host, arguments))
                .UseDefaults()
                .Build()

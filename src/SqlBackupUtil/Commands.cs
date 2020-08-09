@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
+using System.CommandLine.Rendering;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -106,17 +107,17 @@ namespace SqlBackupUtil
             command.Add(option);
             return command;
         }
-        internal static CommandLineBuilder CreateBuilder(InvocationContext invocationContext)
+        internal static CommandLineBuilder CreateBuilder(InvocationContext invocationContext, ConsoleRenderer consoleRenderer)
         {
             // Create a root command with some options
             var rootCommand = new RootCommand("Sql Server Backup Utility");
-            rootCommand.AddCommands(invocationContext);
+            rootCommand.AddCommands(invocationContext, consoleRenderer);
                
             // Parse the incoming args and invoke the handler
             return new CommandLineBuilder(rootCommand);
         }
  
-        internal static RootCommand AddCommands(this RootCommand rootCommand, InvocationContext invocationContext)
+        internal static RootCommand AddCommands(this RootCommand rootCommand, InvocationContext invocationContext, ConsoleRenderer consoleRenderer)
         {
             var command = new Command(
                 "check",
@@ -131,9 +132,10 @@ namespace SqlBackupUtil
                 description: "List backup files.");
             command
                 .AddServerOption()
+                .AddSourceOptions()
                 .AddBackupFilesOptions()
                 .AddBackupTypeOption();
-            command.Handler = CommandHandler.Create<ListOptions>((options) => (new ListCommand(invocationContext,options)).Execute());
+            command.Handler = CommandHandler.Create<ListOptions>((options) => (new ListCommand(invocationContext, consoleRenderer,options)).Execute());
             rootCommand.Add(command);
             return rootCommand;
         }

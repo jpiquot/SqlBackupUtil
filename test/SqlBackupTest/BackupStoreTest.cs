@@ -253,7 +253,7 @@ namespace SqlBackupTest
         }
 
         private static MockFileSystem GetFileSystem()
-                                    => new MockFileSystem(new Dictionary<string, MockFileData>
+            => new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 { @"c:\textfile1.txt", new MockFileData("Not a backup") },
                 { @"c:\backfile1.bak", new MockFileData("A backup") },
@@ -268,5 +268,7 @@ namespace SqlBackupTest
             });
 
         private static Server GetServer() => new Server(TestSettings.SqlServerName);
+
+        
     }
 }

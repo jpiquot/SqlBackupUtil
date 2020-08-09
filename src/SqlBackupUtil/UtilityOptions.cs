@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SqlBackupUtil
 {
 
-    public class UtilityOptions
+    internal class UtilityOptions
     {
         public int FullFrequency { get; set; }
         public int DiffFrequency { get; set; }

@@ -11,7 +11,7 @@ namespace SqlBackupUtil
     /// <summary>
     /// Database backup list view
     /// </summary>
-    public class ListView : StackLayoutView
+    internal class ListView : StackLayoutView
     {
         /// <summary>
         /// Constructor

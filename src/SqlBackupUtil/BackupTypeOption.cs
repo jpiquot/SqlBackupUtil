@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SqlBackupUtil
 {
-    public enum BackupTypeOption
+    internal enum BackupTypeOption
     {
         All,
         Full,

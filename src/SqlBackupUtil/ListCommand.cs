@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
+using System.CommandLine.Rendering.Views;
 using System.IO.Abstractions;
 using System.Linq;
 
@@ -14,19 +15,22 @@ namespace SqlBackupUtil
     /// <summary>
     /// Handle the list command
     /// </summary>
-    public class ListCommand
+    internal class ListCommand
     {
         private readonly InvocationContext _invocationContext;
+        private readonly ConsoleRenderer _consoleRenderer;
         private readonly ListOptions _options;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="invocationContext">The invocation context</param>
+        /// <param name="consoleRenderer"></param>
         /// <param name="options">Command options</param>
-        public ListCommand(InvocationContext invocationContext,ListOptions options)
+        public ListCommand(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, ListOptions options)
         {
-            _invocationContext = invocationContext;
+            _invocationContext = invocationContext ?? throw new ArgumentNullException(nameof(invocationContext));
+            _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
         /// <summary>
@@ -38,22 +42,33 @@ namespace SqlBackupUtil
             settings.BackupFileExtensions = _options.BackupExtensions;
             settings.BackupPaths = _options.BackupDirectories;
             var store = new BackupStore(_options.Server, new FileSystem(), Options.Create(settings));
-            IEnumerable<BackupHeader>? backups = _options.BackupType switch
-            {
-                BackupTypeOption.Full => store.BackupHeaders.Where(p => p.BackupType == BackupType.Full),
-                BackupTypeOption.Diff => store.BackupHeaders.Where(p => p.BackupType == BackupType.Differential),
-                BackupTypeOption.Log => store.BackupHeaders.Where(p => p.BackupType == BackupType.Log),
-                _ => store.BackupHeaders
-            };
+
+            IEnumerable<BackupHeader>? backups = store.GetBackupHeaders
+                (
+                _options.SourceServer, 
+                _options.SourceDatabase, 
+                _options.BackupType switch
+                {
+                    BackupTypeOption.Full => BackupType.Full,
+                    BackupTypeOption.Diff => BackupType.Differential,
+                    BackupTypeOption.Log => BackupType.Log,
+                    _ => null
+                });
+ 
             var list = new ListView(backups, settings.BackupPaths, settings.BackupFileExtensions);
             var console = _invocationContext.Console;
+            if (console is ITerminal terminal)
+            {
+                terminal.Clear();
+            }
 
             var consoleRenderer = new ConsoleRenderer(
                 console,
-                mode: _invocationContext.BindingContext.OutputMode(),
+                mode: OutputMode.Auto,
                 resetAfterRender: true);
 
-            console.Append(list);
+            var screen = new ScreenView(consoleRenderer, _invocationContext.Console) { Child = list };
+            screen.Render();
         }
     }
 }

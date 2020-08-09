@@ -99,12 +99,18 @@ namespace SqlBackup.Database
             return list;
         }
 
-        private IEnumerable<BackupHeader> GetBackupHeaders(BackupType type, string serverName, string databaseName)
-            => BackupHeaders.Where(p => p.BackupType == type && p.DatabaseName == databaseName && p.ServerName == serverName).ToList();
-        private IEnumerable<BackupHeader> GetFullBackupHeaders(string serverName, string databaseName)
-            => GetBackupHeaders(BackupType.Full, serverName, databaseName);
-        private IEnumerable<BackupHeader> GetDiffBackupHeaders(string serverName, string databaseName)
-            => GetBackupHeaders(BackupType.Differential, serverName, databaseName);
+        public IEnumerable<BackupHeader> GetBackupHeaders(string? serverName, string? databaseName, BackupType? type = null)
+            => BackupHeaders.Where(p => 
+                (type == null || p.BackupType == type) && 
+                (databaseName == null || p.DatabaseName == databaseName) && 
+                (serverName == null || p.ServerName == serverName)
+            ).ToList();
+        public IEnumerable<BackupHeader> GetFullBackupHeaders(string? serverName, string? databaseName)
+            => GetBackupHeaders(serverName, databaseName, BackupType.Full);
+        public IEnumerable<BackupHeader> GetDiffBackupHeaders(string? serverName, string? databaseName)
+            => GetBackupHeaders(serverName, databaseName, BackupType.Differential);
+        public IEnumerable<BackupHeader> GetLogBackupHeaders(string? serverName, string? databaseName)
+            => GetBackupHeaders(serverName, databaseName, BackupType.Log);
         public BackupHeader GetLatestFull(string serverName, string databaseName, DateTime? before = null)
         {
             IEnumerable<BackupHeader>? headers = GetFullBackupHeaders(serverName, databaseName);
