@@ -4,15 +4,7 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-using Microsoft.Extensions.Options;
-
-using SqlBackup.Database;
 
 namespace SqlBackupUtil
 {
@@ -44,18 +36,34 @@ namespace SqlBackupUtil
             command.Add(option);
             return command;
         }
-        private static Command AddSourceOptions(this Command command)
+        private static void Required<T>(this Option<T> option)
+        {
+            option.Arity<T>(1, 1);
+        }
+        private static void Arity<T>(this Option<T> option, int minOccurences, int maxOccurences)
+        {
+            option.Argument = new Argument<T>() { Arity = new ArgumentArity(minOccurences, maxOccurences) };
+        }
+        private static Command AddSourceOptions(this Command command, bool required=false)
         {
             var option = new Option<string>(
                     "--source-server",
                     "The source SQL Server name.");
             option.AddAlias("-ss");
+            if (required)
+            {
+                option.Required();
+            }
             command.Add(option);
 
             option = new Option<string>(
                     "--source-database",
                     "The source database name.");
             option.AddAlias("-sd");
+            if (required)
+            {
+                option.Required();
+            }
             command.Add(option);
             return command;
 
@@ -122,6 +130,13 @@ namespace SqlBackupUtil
             var command = new Command(
                 "check",
                 description: "Check if a database backup file exists.");
+            command
+                .AddServerOption()
+                .AddSourceOptions(true)
+                .AddFrequencyOptions()
+                .AddBackupFilesOptions()
+                .AddBackupTypeOption();
+            command.Handler = CommandHandler.Create<CheckOptions>((options) => (new CheckCommand(invocationContext, consoleRenderer, options)).Execute());
             rootCommand.Add(command);
             command = new Command(
                 "restore",

@@ -38,6 +38,11 @@ namespace SqlBackupUtil
                               new ContentSpan(value),
                               ForegroundColorSpan.Reset());
 
+        public static TextSpan LightRed(this string value) =>
+            new ContainerSpan(ForegroundColorSpan.LightRed(),
+                              new ContentSpan(value),
+                              ForegroundColorSpan.Reset());
+
         public static TextSpan LightBlue(this string value) =>
             new ContainerSpan(ForegroundColorSpan.LightBlue(),
                               new ContentSpan(value),

@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 namespace SqlBackupUtil
 {
 
-    internal class ListOptions
+    internal abstract class CommandOptions
     {
         public string Server { get; set; } = "localhost";
 
-        public string? SourceServer { get; set; }
-        public string? SourceDatabase { get; set; }
         public List<string> BackupExtensions { get; set; } = new List<string> { "BAK", "TRN" };
         public List<string> BackupDirectories { get; set; } = new List<string> { @"." };
         public BackupTypeOption BackupType { get; set; } = BackupTypeOption.All;

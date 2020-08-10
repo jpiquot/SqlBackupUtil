@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>netcoreapp5.0</TargetFramework>         
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
 		<Version>0.1.0-preview</Version>
