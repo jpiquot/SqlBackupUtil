@@ -36,7 +36,7 @@ namespace SqlBackupUtil
         /// <summary>
         /// Execute the list command
         /// </summary>
-        public void Execute() 
+        public int Execute() 
         {
             var settings = new BackupStoreSettings();
             settings.BackupFileExtensions = _options.BackupExtensions;
@@ -55,10 +55,11 @@ namespace SqlBackupUtil
                     _ => null
                 });
  
-            var list = new CheckView(backups, _options);
+            var check = new CheckView(backups, _options);
  
-            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
+            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
             screen.Render();
+            return (check.HasErrors)?-1:0;
         }
     }
 }

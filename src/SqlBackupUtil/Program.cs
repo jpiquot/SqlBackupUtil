@@ -60,7 +60,7 @@ namespace SqlBackupUtil
                         }));
         }
 
-        public static async Task Main(InvocationContext invocationContext, string[] args)
+        public static Task<int> Main(InvocationContext invocationContext, string[] args)
         {
             var consoleRenderer = new ConsoleRenderer(
                 invocationContext.Console,
@@ -71,12 +71,12 @@ namespace SqlBackupUtil
                 terminal.Clear();
             }
             string[] arguments = args ?? Array.Empty<string>();
-            await Commands
-               .CreateBuilder(invocationContext, consoleRenderer)
-               .UseHost(_ => Host.CreateDefaultBuilder(), host => CreateHostBuilder(host, arguments))
-               .UseDefaults()
-               .Build()
-               .InvokeAsync(arguments);
+                return Commands
+                   .CreateBuilder(invocationContext, consoleRenderer)
+                   .UseHost(_ => Host.CreateDefaultBuilder(), host => CreateHostBuilder(host, arguments))
+                   .UseDefaults()
+                   .Build()
+                   .InvokeAsync(arguments);
         }
     }
 }

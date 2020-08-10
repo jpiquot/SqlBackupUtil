@@ -33,6 +33,7 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Sql backup utility V{Assembly.GetExecutingAssembly().GetName().Version}".Orange())));
             Add(new ContentView(Span($"(c) Jérôme Piquot Fiveforty 2020".DarkOrange())));
             Add(new ContentView("\n"));
+            Add(new ContentView(Span($"Command:             {string.Join("; ", options.Command).White()}")));
             Add(new ContentView(Span($"Sql server:          {string.Join("; ", options.Server).DarkGrey()}")));
             Add(new ContentView("\n"));
             Add(new ContentView(Span($"Backup directories:  {string.Join("; ", options.BackupDirectories).DarkGrey()}")));
@@ -40,12 +41,13 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Backup type:         {options.BackupType.ToString().DarkGrey()}")));
             AddSummaryInformation();
             Add(new ContentView("\n"));
-
             _tableView = new TableView<TItems>();
-            AddTableInformation();
+            if (backups.Any())
+            {
+                AddTableInformation();
 
-            Add(_tableView);
-
+                Add(_tableView);
+            }
             Formatter.AddFormatter<DateTime>(d => $"{d:d} {ForegroundColorSpan.DarkGray()}{d:t}");
         }
 

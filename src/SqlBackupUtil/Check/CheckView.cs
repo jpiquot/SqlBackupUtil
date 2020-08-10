@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
 using System.Linq;
-using System.Reflection;
 
 using SqlBackup.Database;
 
@@ -14,6 +13,7 @@ namespace SqlBackupUtil
     /// </summary>
     internal class CheckView : CommandView<BackupHeader, CheckOptions>
     {
+        public bool HasErrors;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -57,6 +57,30 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Diff frequency:      {(_options.DiffFrequency).ToString().DarkGrey()}")));
             Add(new ContentView(Span($"Log frequency:       {(_options.LogFrequency).ToString().DarkGrey()}")));
 
+            if (_options.BackupType == BackupTypeOption.Full || _options.BackupType == BackupTypeOption.All)
+            {
+                if (!_backups.Any(p => p.BackupType == BackupType.Full))
+                {
+                    HasErrors = true;
+                    Add(new ContentView(Span($"Full backup missing!".LightRed())));
+                }
+            }
+            if (_options.BackupType == BackupTypeOption.Diff || _options.BackupType == BackupTypeOption.All)
+            {
+                if (!_backups.Any(p => p.BackupType == BackupType.Differential))
+                {
+                    HasErrors = true;
+                    Add(new ContentView(Span($"Differential backup missing!".LightRed())));
+                }
+            }
+            if (_options.BackupType == BackupTypeOption.Log || _options.BackupType == BackupTypeOption.All)
+            {
+                if (!_backups.Any(p => p.BackupType == BackupType.Log))
+                {
+                    HasErrors = true;
+                    Add(new ContentView(Span($"Log backup missing!".LightRed())));
+                }
+            }
         }
         TextSpan FormatTime (BackupHeader backup)
         {
@@ -80,7 +104,8 @@ namespace SqlBackupUtil
                 BackupType.Log => (totalMinutes > _options.LogFrequency),
                 _ => throw new NotSupportedException($"Backup type not supported."),
             };
-            return (obsolete) ? text.LightGreen() : text.LightRed();
+            HasErrors = obsolete || HasErrors;
+            return obsolete ? text.LightGreen() : text.LightRed();
         }
     }
 }

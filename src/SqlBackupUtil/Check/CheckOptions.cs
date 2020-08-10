@@ -10,6 +10,10 @@ namespace SqlBackupUtil
 
     internal class CheckOptions : CommandOptions
     {
+        public CheckOptions()
+        {
+            Command = "CHECK";
+        }
         public string SourceServer { get; set; } = string.Empty;
         public string SourceDatabase { get; set; } = string.Empty;
 

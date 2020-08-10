@@ -10,6 +10,7 @@ namespace SqlBackupUtil
 
     internal abstract class CommandOptions
     {
+        public string Command { get; set; } = string.Empty;
         public string Server { get; set; } = "localhost";
 
         public List<string> BackupExtensions { get; set; } = new List<string> { "BAK", "TRN" };

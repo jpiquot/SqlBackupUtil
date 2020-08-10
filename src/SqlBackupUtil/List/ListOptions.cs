@@ -10,6 +10,10 @@ namespace SqlBackupUtil
 
     internal class ListOptions : CommandOptions
     {
+        public ListOptions()
+        {
+            Command = "LIST";
+        }
         public string? SourceServer { get; set; }
         public string? SourceDatabase { get; set; }
 
