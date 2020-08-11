@@ -60,6 +60,7 @@ namespace SqlBackupUtil
             screen.Render();
 
             var restore = new DatabaseRestore(_options.Server, _options.Database, backups);
+            restore.Execute();
         }
     }
 }

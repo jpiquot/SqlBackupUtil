@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.SqlServer.Management.Smo;
 
@@ -37,13 +36,13 @@ namespace SqlBackup.Database
             _backups = backups ?? throw new ArgumentNullException(nameof(backups));
         }
 
-        public Restore Restore => _restore ??= InitRestore();
+        private Restore Restore => _restore ??= InitRestore();
         private Restore InitRestore()
         {
             var restore = new Restore()
             {
                 Action = RestoreActionType.Database,
-                Database = _destinationDatabaseName,
+                Database = _destinationDatabaseName,               
                 ReplaceDatabase = true
             };
             foreach (string fileName in _backups.Select(p => p.FileName).Distinct())
@@ -57,11 +56,30 @@ namespace SqlBackup.Database
         /// </summary>
         public void Execute()
         {
+            foreach (DataRow file in Restore.ReadFileList(_server).Rows)
+            {
+                Restore.RelocateFiles.Add(Relocate(file));
+            }
             //Gets the exclusive access to database
             _server.KillAllProcesses(_destinationDatabaseName);
             Restore.Wait();
 
             Restore.SqlRestore(_server);
+        }
+        private RelocateFile Relocate (DataRow row)
+        {
+            RelocateFile file = new ();
+            if ((string)row[1] == "D")
+            {
+                file.LogicalFileName = _destinationDatabaseName;
+                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName+".mdf");
+            }
+            else
+            {
+                file.LogicalFileName = _destinationDatabaseName+"_log";
+                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName+"_log.ldf");
+            }
+            return file;
         }
 
     }
