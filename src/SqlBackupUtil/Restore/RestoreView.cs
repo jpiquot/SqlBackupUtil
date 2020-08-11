@@ -13,7 +13,6 @@ namespace SqlBackupUtil
     /// </summary>
     internal class RestoreView : CommandView<BackupHeader, RestoreOptions>
     {
-        public bool HasErrors;
         /// <summary>
         /// Constructor
         /// </summary>

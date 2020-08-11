@@ -4,7 +4,6 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
 using System.IO.Abstractions;
-using System.Linq;
 
 using Microsoft.Extensions.Options;
 
@@ -36,14 +35,14 @@ namespace SqlBackupUtil
         /// <summary>
         /// Execute the list command
         /// </summary>
-        public int Execute() 
+        public void Execute() 
         {
             var settings = new BackupStoreSettings();
             settings.BackupFileExtensions = _options.BackupExtensions;
             settings.BackupPaths = _options.BackupDirectories;
             var store = new BackupStore(_options.Server, new FileSystem(), Options.Create(settings));
-
-            IEnumerable<BackupHeader>? backups = store.GetBackupHeaders
+ 
+            IEnumerable<BackupHeader> backups = store.GetLatestBackup
                 (
                 _options.SourceServer, 
                 _options.SourceDatabase, 
@@ -59,7 +58,6 @@ namespace SqlBackupUtil
  
             var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
             screen.Render();
-            return (check.HasErrors)?-1:0;
         }
     }
 }
