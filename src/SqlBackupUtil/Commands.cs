@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
@@ -10,7 +9,7 @@ namespace SqlBackupUtil
 {
     internal static class Commands
     {
-        private static Command AddFrequencyOptions (this Command command)
+        private static Command AddFrequencyOptions(this Command command)
         {
             var option = new Option<int>
                 (
@@ -37,14 +36,13 @@ namespace SqlBackupUtil
             return command;
         }
         private static void Required<T>(this Option<T> option)
-        {
-            option.Arity<T>(1, 1);
-        }
+            => option.Argument = new Argument<T>()
+            {
+                Arity = ArgumentArity.ExactlyOne
+            };
         private static void Arity<T>(this Option<T> option, int minOccurences, int maxOccurences)
-        {
-            option.Argument = new Argument<T>() { Arity = new ArgumentArity(minOccurences, maxOccurences) };
-        }
-        private static Command AddSourceOptions(this Command command, bool required=false)
+            => option.Argument = new Argument<T>() { Arity = new ArgumentArity(minOccurences, maxOccurences) };
+        private static Command AddSourceOptions(this Command command, bool required = false)
         {
             var option = new Option<string>(
                     "--source-server",
@@ -68,14 +66,14 @@ namespace SqlBackupUtil
             return command;
 
         }
-        private static Command AddServerOption(this Command command)
+        private static RootCommand AddServerOption(this RootCommand command)
         {
             var option = new Option<string>(
                     "--server",
                     () => "localhost",
                     "The name of the SQL Server used for the operation.");
             option.AddAlias("-s");
-            command.Add(option);
+            command.AddGlobalOption(option);
             return command;
         }
         private static Command AddDatabaseOption(this Command command)
@@ -88,31 +86,31 @@ namespace SqlBackupUtil
             command.Add(option);
             return command;
         }
-        private static Command AddBackupFilesOptions(this Command command)
+        private static RootCommand AddBackupFilesOptions(this RootCommand command)
         {
             var option = new Option<List<string>>(
                     "--backup-extensions",
                     () => new List<string> { "BAK", "TRN" },
                     "The backup files extensions.");
             option.AddAlias("-be");
-            command.Add(option);
+            command.AddGlobalOption(option);
 
             option = new Option<List<string>>(
                     "--backup-directories",
                     () => new List<string> { "." },
                     "The backup directories.");
             option.AddAlias("-bd");
-            command.Add(option);
+            command.AddGlobalOption(option);
             return command;
         }
-        private static Command AddBackupTypeOption(this Command command)
+        private static RootCommand AddBackupTypeOption(this RootCommand command)
         {
             var option = new Option<BackupTypeOption>(
                     "--backup-type",
                     () => BackupTypeOption.All,
                     "The backup type.");
             option.AddAlias("-bt");
-            command.Add(option);
+            command.AddGlobalOption(option);
             return command;
         }
         internal static CommandLineBuilder CreateBuilder(InvocationContext invocationContext, ConsoleRenderer consoleRenderer)
@@ -120,37 +118,39 @@ namespace SqlBackupUtil
             // Create a root command with some options
             var rootCommand = new RootCommand("Sql Server Backup Utility");
             rootCommand.AddCommands(invocationContext, consoleRenderer);
-               
+
             // Parse the incoming args and invoke the handler
             return new CommandLineBuilder(rootCommand);
         }
- 
+
         internal static RootCommand AddCommands(this RootCommand rootCommand, InvocationContext invocationContext, ConsoleRenderer consoleRenderer)
         {
+            rootCommand
+                .AddServerOption()
+                .AddBackupFilesOptions()
+                .AddBackupTypeOption();
             var command = new Command(
                 "check",
                 description: "Check if a database backup file exists.");
+            command.AddAlias("c");
             command
-                .AddServerOption()
                 .AddSourceOptions(true)
-                .AddFrequencyOptions()
-                .AddBackupFilesOptions()
-                .AddBackupTypeOption();
+                .AddFrequencyOptions();
             command.Handler = CommandHandler.Create<CheckOptions>((options) => (new CheckCommand(invocationContext, consoleRenderer, options)).Execute());
             rootCommand.Add(command);
             command = new Command(
                 "restore",
                 description: "Restore the database.");
+            command.AddAlias("r");
+            command.Handler = CommandHandler.Create<RestoreOptions>((options) => (new RestoreCommand(invocationContext, consoleRenderer, options)).Execute());
             rootCommand.Add(command);
             command = new Command(
                 "list",
                 description: "List backup files.");
+            command.AddAlias("l");
             command
-                .AddServerOption()
-                .AddSourceOptions()
-                .AddBackupFilesOptions()
-                .AddBackupTypeOption();
-            command.Handler = CommandHandler.Create<ListOptions>((options) => (new ListCommand(invocationContext, consoleRenderer,options)).Execute());
+                .AddSourceOptions();
+            command.Handler = CommandHandler.Create<ListOptions>((options) => (new ListCommand(invocationContext, consoleRenderer, options)).Execute());
             rootCommand.Add(command);
             return rootCommand;
         }

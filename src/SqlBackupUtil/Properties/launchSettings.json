@@ -2,7 +2,8 @@
   "profiles": {
     "SqlBackupUtil": {
       "commandName": "Project",
-      "commandLineArgs": "check --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak --full-frequency 2000 --diff-frequency 240 --log-frequency 10"
+      "commandLineArgs": "check --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak --full-frequency 2000 --diff-frequency 240 --log-frequency 10 --source-server DESKTOP-NVACFK6 --source-database Test",
+      "sqlDebugging": true
     }
   }
 }

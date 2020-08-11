@@ -9,7 +9,7 @@ using SqlBackup.Database;
 namespace SqlBackupUtil
 {
     /// <summary>
-    /// Database backup list view
+    /// Database backup check view
     /// </summary>
     internal class CheckView : CommandView<BackupHeader, CheckOptions>
     {
@@ -84,7 +84,7 @@ namespace SqlBackupUtil
         }
         TextSpan FormatTime (BackupHeader backup)
         {
-            int totalMinutes = (DateTime.Now - backup.StartDate).Minutes;
+            int totalMinutes = (int)(DateTime.Now - backup.StartDate).TotalMinutes;
             int days = totalMinutes / (24 * 60);
             int hours = (totalMinutes % (24 * 60)) / 60;
             int minutes = (totalMinutes % (24 * 60)) % 60;
@@ -105,7 +105,7 @@ namespace SqlBackupUtil
                 _ => throw new NotSupportedException($"Backup type not supported."),
             };
             HasErrors = obsolete || HasErrors;
-            return obsolete ? text.LightGreen() : text.LightRed();
+            return obsolete ? text.LightRed() : text.LightGreen();
         }
     }
 }

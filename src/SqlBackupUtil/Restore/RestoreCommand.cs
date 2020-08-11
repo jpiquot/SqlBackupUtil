@@ -13,13 +13,13 @@ using SqlBackup.Database;
 namespace SqlBackupUtil
 {
     /// <summary>
-    /// Handle the check command
+    /// Handle the restore command
     /// </summary>
-    internal class CheckCommand
+    internal class RestoreCommand
     {
         private readonly InvocationContext _invocationContext;
         private readonly ConsoleRenderer _consoleRenderer;
-        private readonly CheckOptions _options;
+        private readonly RestoreOptions _options;
 
         /// <summary>
         /// Constructor
@@ -27,14 +27,14 @@ namespace SqlBackupUtil
         /// <param name="invocationContext">The invocation context</param>
         /// <param name="consoleRenderer"></param>
         /// <param name="options">Command options</param>
-        public CheckCommand(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, CheckOptions options)
+        public RestoreCommand(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, RestoreOptions options)
         {
             _invocationContext = invocationContext ?? throw new ArgumentNullException(nameof(invocationContext));
             _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
         /// <summary>
-        /// Execute the check command
+        /// Execute the list command
         /// </summary>
         public int Execute() 
         {
@@ -55,7 +55,7 @@ namespace SqlBackupUtil
                     _ => null
                 });
  
-            var check = new CheckView(backups, _options);
+            var check = new RestoreView(backups, _options);
  
             var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
             screen.Render();
