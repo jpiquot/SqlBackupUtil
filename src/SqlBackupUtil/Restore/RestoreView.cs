@@ -46,7 +46,7 @@ namespace SqlBackupUtil
         }
         protected override void AddSummaryInformation()
         {
-            Add(new ContentView(Span($"Destination database:     {(_options.Database ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Database:            {(_options.Database ?? "All").DarkGrey()}")));
             Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
             Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
         }

@@ -11,24 +11,58 @@ namespace SqlBackup.Database
 {
     public class DatabaseRestore
     {
-        private readonly string destinationDatabaseName;
-        private readonly IEnumerable<string> fileNames;
-        private readonly Server server;
+        private readonly string _destinationDatabaseName;
+        private readonly IEnumerable<BackupHeader> _backups;
+        private readonly Server _server;
         private Restore? _restore;
 
         /// <summary>
-        /// Restore constructor
+        /// Constructor
         /// </summary>
-        /// <param name="destinationDatabaseName">The name of the database to restore</param>
-        /// <param name="fileNames">              The backup files names</param>
-        public DatabaseRestore(Server server, string destinationDatabaseName, IEnumerable<string> fileNames)
+        /// <param name="serverName"></param>
+        /// <param name="destinationDatabaseName"></param>
+        /// <param name="backups"></param>
+        public DatabaseRestore(string serverName, string destinationDatabaseName, IEnumerable<BackupHeader> backups)
         {
-            this.fileNames = fileNames ?? throw new ArgumentNullException(nameof(fileNames));
-            this.destinationDatabaseName = destinationDatabaseName ?? throw new ArgumentNullException(nameof(destinationDatabaseName));
-            this.server = server ?? throw new ArgumentNullException(nameof(server)); ;
+            if (string.IsNullOrWhiteSpace(serverName))
+            {
+                throw new ArgumentException(Properties.Resources.ArgumentIsNullOrWhitespace, nameof(serverName));
+            }
+            if (string.IsNullOrWhiteSpace(destinationDatabaseName))
+            {
+                throw new ArgumentException(Properties.Resources.ArgumentIsNullOrWhitespace, nameof(destinationDatabaseName));
+            }
+            _server = new Server(serverName);
+            _destinationDatabaseName = destinationDatabaseName;
+            _backups = backups ?? throw new ArgumentNullException(nameof(backups));
         }
 
-        //public BackupSet BackupSet => new BackupSet();
-        public Restore Restore => _restore ??= new Restore();
+        public Restore Restore => _restore ??= InitRestore();
+        private Restore InitRestore()
+        {
+            var restore = new Restore()
+            {
+                Action = RestoreActionType.Database,
+                Database = _destinationDatabaseName,
+                ReplaceDatabase = true
+            };
+            foreach (string fileName in _backups.Select(p => p.FileName).Distinct())
+            {
+                restore.Devices.Add(new BackupDeviceItem(fileName, DeviceType.File));
+            }
+            return restore;
+        }
+        /// <summary>
+        /// Execute the restore operation on the database
+        /// </summary>
+        public void Execute()
+        {
+            //Gets the exclusive access to database
+            _server.KillAllProcesses(_destinationDatabaseName);
+            Restore.Wait();
+
+            Restore.SqlRestore(_server);
+        }
+
     }
 }

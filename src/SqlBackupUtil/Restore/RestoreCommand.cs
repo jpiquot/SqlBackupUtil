@@ -58,6 +58,8 @@ namespace SqlBackupUtil
  
             var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
             screen.Render();
+
+            var restore = new DatabaseRestore(_options.Server, _options.Database, backups);
         }
     }
 }

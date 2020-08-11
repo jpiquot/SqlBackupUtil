@@ -142,6 +142,9 @@ namespace SqlBackupUtil
                 "restore",
                 description: "Restore the database.");
             command.AddAlias("r");
+            command
+                .AddDatabaseOption()
+                .AddSourceOptions();
             command.Handler = CommandHandler.Create<RestoreOptions>((options) => (new RestoreCommand(invocationContext, consoleRenderer, options)).Execute());
             rootCommand.Add(command);
             command = new Command(

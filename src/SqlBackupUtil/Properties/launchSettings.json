@@ -1,9 +1,24 @@
 {
-  "profiles": {
-    "SqlBackupUtil": {
-      "commandName": "Project",
-      "commandLineArgs": "check --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak --full-frequency 2000 --diff-frequency 240 --log-frequency 10 --source-server DESKTOP-NVACFK6 --source-database Test",
-      "sqlDebugging": true
+    "profiles": {
+        "SqlBackupUtil": {
+            "commandName": "Project",
+            "commandLineArgs": "",
+            "sqlDebugging": true
+        },
+        "List": {
+            "commandName": "Project",
+            "commandLineArgs": "list --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak",
+            "sqlDebugging": true
+        },
+        "Check": {
+            "commandName": "Project",
+            "commandLineArgs": "check --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak --full-frequency 2000 --diff-frequency 240 --log-frequency 10 --source-server DESKTOP-NVACFK6 --source-database Test",
+            "sqlDebugging": true
+        },
+        "Restore": {
+            "commandName": "Project",
+            "commandLineArgs": "restore --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak --source-server DESKTOP-NVACFK6 --source-database Test --database TestRestore",
+            "sqlDebugging": true
+        }
     }
-  }
 }
