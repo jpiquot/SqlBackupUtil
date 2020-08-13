@@ -13,5 +13,7 @@ namespace SqlBackupUtil
         public string? Login { get; set; }
         public string? Password { get; set; }
         public string Server { get; set; } = "localhost";
+        public string? SourceDatabase { get; set; }
+        public string? SourceServer { get; set; }
     }
 }

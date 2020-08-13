@@ -14,7 +14,9 @@ namespace SqlBackupUtil
             : base("check", "Check if a database backup file exists.")
         {
             AddAlias("c");
-            AddOption(new DatabaseOption(defaultValues));
+            AddOption(new FullFrequencyOption(defaultValues));
+            AddOption(new DiffFrequencyOption(defaultValues));
+            AddOption(new LogFrequencyOption(defaultValues));
         }
     }
 }

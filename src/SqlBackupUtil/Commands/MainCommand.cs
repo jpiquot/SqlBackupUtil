@@ -1,4 +1,5 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 
@@ -12,9 +13,14 @@ namespace SqlBackupUtil
     /// <seealso cref="System.CommandLine.RootCommand"/>
     internal class MainCommand : RootCommand
     {
-        public MainCommand(IOptions<SqlBackupSettings> defaultValues)
+        private readonly ConsoleRenderer _consoleRenderer;
+        private readonly InvocationContext _invocationContext;
+
+        public MainCommand(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, IOptions<SqlBackupSettings> defaultValues)
             : base("Sql Server Backup Utility")
         {
+            _invocationContext = invocationContext ?? throw new ArgumentNullException(nameof(invocationContext));
+            _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
             AddGlobalOption(new ServerOption(defaultValues));
             AddGlobalOption(new BackupExtensionsOption(defaultValues));
             AddGlobalOption(new BackupDirectoriesOption(defaultValues));
@@ -27,10 +33,10 @@ namespace SqlBackupUtil
             var command = new CheckCommand(defaultValues)
             {
                 Handler =
-                CommandHandler.Create<InvocationContext, ConsoleRenderer, CheckOptions>
+                CommandHandler.Create<CheckOptions>
                 (
-                    (invocationContext, consoleRenderer, options)
-                        => new CheckCommandHandler(invocationContext, consoleRenderer, options).Execute()
+                    (options)
+                        => new CheckCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
                 )
             };
 

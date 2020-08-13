@@ -18,6 +18,7 @@ namespace SqlBackupUtil
     internal class Startup
     {
         private readonly string[] _args;
+        private readonly ConsoleRenderer _consoleRenderer;
         private readonly InvocationContext _invocationContext;
         private IConfiguration? _configuration;
 
@@ -26,6 +27,10 @@ namespace SqlBackupUtil
         internal Startup(InvocationContext invocationContext, string[]? args)
         {
             _invocationContext = invocationContext;
+            _consoleRenderer = new ConsoleRenderer(
+                        _invocationContext.Console,
+                        OutputMode.Ansi,
+                        true);
             _args = args ?? Array.Empty<string>();
         }
 
@@ -43,6 +48,8 @@ namespace SqlBackupUtil
             }
             return new CommandLineBuilder(
                 new MainCommand(
+                        _invocationContext,
+                        _consoleRenderer,
                         Options.Create
                         (
                             Configuration.GetValue<SqlBackupSettings>(nameof(SqlBackupSettings))
