@@ -38,9 +38,11 @@ namespace SqlBackupUtil
         /// </summary>
         public void Execute()
         {
-            var settings = new BackupStoreSettings();
-            settings.BackupFileExtensions = _options.BackupExtensions;
-            settings.BackupPaths = _options.BackupDirectories;
+            var settings = new BackupStoreSettings
+            {
+                BackupFileExtensions = _options.BackupExtensions,
+                BackupPaths = _options.BackupDirectories
+            };
             var store = new BackupStore(_options.Server, new FileSystem(), Options.Create(settings));
             _ = _options.SourceServer ?? throw new NotSupportedException("The source server must be defined.");
             _ = _options.SourceDatabase ?? throw new NotSupportedException("The source database must be defined.");
