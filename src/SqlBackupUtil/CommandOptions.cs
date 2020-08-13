@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     {
         public List<string> BackupDirectories { get; set; } = new List<string> { @"." };
         public List<string> BackupExtensions { get; set; } = new List<string> { "BAK", "TRN" };
-        public BackupTypeOption BackupType { get; set; } = BackupTypeOption.All;
+        public BackupTypes BackupType { get; set; } = BackupTypes.All;
         public string Command { get; set; } = string.Empty;
         public string? Login { get; set; }
         public string? Password { get; set; }

@@ -17,8 +17,8 @@ namespace SqlBackupUtil
     /// </summary>
     internal class ListCommand
     {
-        private readonly InvocationContext _invocationContext;
         private readonly ConsoleRenderer _consoleRenderer;
+        private readonly InvocationContext _invocationContext;
         private readonly ListOptions _options;
 
         /// <summary>
@@ -33,10 +33,11 @@ namespace SqlBackupUtil
             _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
+
         /// <summary>
         /// Execute the list command
         /// </summary>
-        public void Execute() 
+        public void Execute()
         {
             var settings = new BackupStoreSettings();
             settings.BackupFileExtensions = _options.BackupExtensions;
@@ -45,18 +46,18 @@ namespace SqlBackupUtil
 
             IEnumerable<BackupHeader>? backups = store.GetBackupHeaders
                 (
-                _options.SourceServer, 
-                _options.SourceDatabase, 
+                _options.SourceServer,
+                _options.SourceDatabase,
                 _options.BackupType switch
                 {
-                    BackupTypeOption.Full => BackupType.Full,
-                    BackupTypeOption.Diff => BackupType.Differential,
-                    BackupTypeOption.Log => BackupType.Log,
+                    BackupTypes.Full => BackupType.Full,
+                    BackupTypes.Diff => BackupType.Differential,
+                    BackupTypes.Log => BackupType.Log,
                     _ => null
                 });
- 
+
             var list = new ListView(backups, _options);
- 
+
             var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
             screen.Render();
         }

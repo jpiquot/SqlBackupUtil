@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace SqlBackupUtil
 {
@@ -35,45 +37,60 @@ namespace SqlBackupUtil
 
         internal Task<int> StartAsync()
         {
-            var consoleRenderer = new ConsoleRenderer(
-                _invocationContext.Console,
-                OutputMode.Ansi,
-                true);
             if (_invocationContext.Console is ITerminal terminal)
             {
                 terminal.Clear();
             }
-            return Commands
-                .CreateBuilder(_invocationContext, consoleRenderer)
+            return new CommandLineBuilder(
+                new MainCommand(
+                        Options.Create
+                        (
+                            Configuration.GetValue<SqlBackupSettings>(nameof(SqlBackupSettings))
+                        )))
                 .UseDefaults()
-                .UseHost()
+                .UseHost(_ => Host
+                    .CreateDefaultBuilder()
+                    .ConfigureAppConfiguration((builder) => Configure(builder))
+                    .ConfigureHostConfiguration((builder) => Configure(builder))
+                    .ConfigureServices((services) => ConfigureServices(services)))
                 .Build()
                 .InvokeAsync(_args ?? Array.Empty<string>(), _invocationContext.Console);
         }
 
         private IConfiguration Configure()
+            => Configure(new ConfigurationBuilder()).Build();
+
+        private IConfigurationBuilder Configure(IConfigurationBuilder builder)
         {
-            var config = new ConfigurationBuilder()
+            builder
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true);
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLowerInvariant() == "development")
             {
-                config.AddUserSecrets<Program>();
+                builder.AddUserSecrets<Program>();
             }
-            return config
+            builder
                 .AddEnvironmentVariables()
                 .AddEnvironmentVariables("ASPNETCORE_")
                 .AddEnvironmentVariables("NETCORE_")
                 .AddEnvironmentVariables("DOTNET_")
-                .AddCommandLine(_args)
-                .Build();
+                .AddCommandLine(_args);
+            return builder;
         }
 
-        private IServiceProvider ConfigureServices()
-            => new ServiceCollection()
+        private IServiceCollection ConfigureServices(IServiceCollection services)
+            => services
                 .AddOptions()
-                .Configure<SqlBackupSettings>(Configuration)
+                .AddSingleton(_invocationContext)
+                .AddSingleton(p => new ConsoleRenderer(
+                        _invocationContext.Console,
+                        OutputMode.Ansi,
+                        true))
+                .Configure<SqlBackupSettings>(Configuration);
+
+        private IServiceProvider ConfigureServices()
+            => ConfigureServices(new ServiceCollection())
                 .BuildServiceProvider();
     }
 }

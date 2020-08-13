@@ -14,6 +14,7 @@ namespace SqlBackupUtil
     internal class CheckView : CommandView<BackupHeader, CheckOptions>
     {
         public bool HasErrors;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -21,8 +22,40 @@ namespace SqlBackupUtil
         /// <param name="options"></param>
         public CheckView(IEnumerable<BackupHeader> backups, CheckOptions options) : base(backups, options)
         {
+        }
 
+        protected override void AddSummaryInformation()
+        {
+            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Full frequency:      {(_options.FullFrequency).ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Diff frequency:      {(_options.DiffFrequency).ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Log frequency:       {(_options.LogFrequency).ToString().DarkGrey()}")));
 
+            if (_options.BackupType == BackupTypes.Full || _options.BackupType == BackupTypes.All)
+            {
+                if (!_backups.Any(p => p.BackupType == BackupType.Full))
+                {
+                    HasErrors = true;
+                    Add(new ContentView(Span($"Full backup missing!".LightRed())));
+                }
+            }
+            if (_options.BackupType == BackupTypes.Diff || _options.BackupType == BackupTypes.All)
+            {
+                if (!_backups.Any(p => p.BackupType == BackupType.Differential))
+                {
+                    HasErrors = true;
+                    Add(new ContentView(Span($"Differential backup missing!".LightRed())));
+                }
+            }
+            if (_options.BackupType == BackupTypes.Log || _options.BackupType == BackupTypes.All)
+            {
+                if (!_backups.Any(p => p.BackupType == BackupType.Log))
+                {
+                    HasErrors = true;
+                    Add(new ContentView(Span($"Log backup missing!".LightRed())));
+                }
+            }
         }
 
         protected override void AddTableInformation()
@@ -49,40 +82,8 @@ namespace SqlBackupUtil
                 cellValue: f => Span(f.FileName),
                 header: new ContentView("Backup file".Underline()));
         }
-        protected override void AddSummaryInformation()
-        {
-            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Full frequency:      {(_options.FullFrequency).ToString().DarkGrey()}")));
-            Add(new ContentView(Span($"Diff frequency:      {(_options.DiffFrequency).ToString().DarkGrey()}")));
-            Add(new ContentView(Span($"Log frequency:       {(_options.LogFrequency).ToString().DarkGrey()}")));
 
-            if (_options.BackupType == BackupTypeOption.Full || _options.BackupType == BackupTypeOption.All)
-            {
-                if (!_backups.Any(p => p.BackupType == BackupType.Full))
-                {
-                    HasErrors = true;
-                    Add(new ContentView(Span($"Full backup missing!".LightRed())));
-                }
-            }
-            if (_options.BackupType == BackupTypeOption.Diff || _options.BackupType == BackupTypeOption.All)
-            {
-                if (!_backups.Any(p => p.BackupType == BackupType.Differential))
-                {
-                    HasErrors = true;
-                    Add(new ContentView(Span($"Differential backup missing!".LightRed())));
-                }
-            }
-            if (_options.BackupType == BackupTypeOption.Log || _options.BackupType == BackupTypeOption.All)
-            {
-                if (!_backups.Any(p => p.BackupType == BackupType.Log))
-                {
-                    HasErrors = true;
-                    Add(new ContentView(Span($"Log backup missing!".LightRed())));
-                }
-            }
-        }
-        TextSpan FormatTime (BackupHeader backup)
+        private TextSpan FormatTime(BackupHeader backup)
         {
             int totalMinutes = (int)(DateTime.Now - backup.StartDate).TotalMinutes;
             int days = totalMinutes / (24 * 60);
@@ -91,11 +92,11 @@ namespace SqlBackupUtil
             string text = $"{minutes} minutes";
             if (days > 0 || hours > 0)
             {
-                text = $"{hours} hours "+text;
+                text = $"{hours} hours " + text;
             }
             if (days > 0)
             {
-                text = $"{days} days "+text;
+                text = $"{days} days " + text;
             }
             bool obsolete = backup.BackupType switch
             {
@@ -109,4 +110,3 @@ namespace SqlBackupUtil
         }
     }
 }
-

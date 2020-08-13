@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Source Server Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    public class SourceServerOption : Option<string>
+    internal class SourceServerOption : Option<string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SourceServerOption"/> class.

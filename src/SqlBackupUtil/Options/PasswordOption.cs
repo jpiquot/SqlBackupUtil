@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Password Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    public class PasswordOption : Option<string>
+    internal class PasswordOption : Option<string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PasswordOption"/> class.

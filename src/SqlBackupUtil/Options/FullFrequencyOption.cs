@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Full Frequency Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    public class FullFrequencyOption : Option<int>
+    internal class FullFrequencyOption : Option<int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FullFrequencyOption"/> class.

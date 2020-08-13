@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Diff Frequency Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    public class DiffFrequencyOption : Option<int>
+    internal class DiffFrequencyOption : Option<int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DiffFrequencyOption"/> class.

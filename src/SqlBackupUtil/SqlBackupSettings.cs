@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace SqlBackupUtil
 {
-    public class SqlBackupSettings
+    internal class SqlBackupSettings
     {
         public List<string>? BackupDirectories { get; set; }
         public List<string>? BackupExtensions { get; set; }
-        public BackupTypeOption? BackupType { get; set; }
+        public BackupTypes? BackupType { get; set; }
         public string? Command { get; set; }
         public string? Database { get; set; }
         public int? DiffFrequency { get; set; }

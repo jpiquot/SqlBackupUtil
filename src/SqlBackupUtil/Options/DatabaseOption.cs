@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Database Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    public class DatabaseOption : Option<string>
+    internal class DatabaseOption : Option<string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseOption"/> class.

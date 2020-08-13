@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Login Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    public class LoginOption : Option<string>
+    internal class LoginOption : Option<string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginOption"/> class.

@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Log Frequency Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    public class LogFrequencyOption : Option<int>
+    internal class LogFrequencyOption : Option<int>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LogFrequencyOption"/> class.
