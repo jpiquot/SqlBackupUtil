@@ -38,9 +38,13 @@ namespace SqlBackupUtil
         /// </summary>
         public void Execute()
         {
-            var settings = new BackupStoreSettings();
-            settings.BackupFileExtensions = _options.BackupExtensions;
-            settings.BackupPaths = _options.BackupDirectories;
+            var settings = new BackupStoreSettings
+            {
+                Login = _options.Login,
+                Password = _options.Password,
+                BackupFileExtensions = _options.BackupExtensions,
+                BackupPaths = _options.BackupDirectories
+            };
             var store = new BackupStore(_options.Server, new FileSystem(), Options.Create(settings));
 
             IEnumerable<BackupHeader>? backups = store.GetBackupHeaders

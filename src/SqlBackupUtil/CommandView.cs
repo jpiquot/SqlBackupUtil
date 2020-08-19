@@ -5,8 +5,6 @@ using System.CommandLine.Rendering.Views;
 using System.Linq;
 using System.Reflection;
 
-using SqlBackup.Database;
-
 namespace SqlBackupUtil
 {
     /// <summary>
@@ -15,9 +13,9 @@ namespace SqlBackupUtil
     internal abstract class CommandView<TItems, TOptions> : StackLayoutView
         where TOptions : CommandOptions
     {
-        protected readonly TableView<TItems> _tableView;
         protected readonly IEnumerable<TItems> _backups;
         protected readonly TOptions _options;
+        protected readonly TableView<TItems> _tableView;
 
         /// <summary>
         /// Constructor
@@ -26,12 +24,11 @@ namespace SqlBackupUtil
         /// <param name="options"></param>
         public CommandView(IEnumerable<TItems> backups, TOptions options)
         {
-
             _backups = backups;
             _options = options;
             Add(new ContentView("\n"));
             Add(new ContentView(Span($"Sql backup utility V{Assembly.GetExecutingAssembly().GetName().Version}".Orange())));
-            Add(new ContentView(Span($"(c) Jérôme Piquot Fiveforty 2020".DarkOrange())));
+            Add(new ContentView(Span($"Jérôme Piquot".DarkOrange())));
             Add(new ContentView("\n"));
             Add(new ContentView(Span($"Command:             {string.Join("; ", options.Command).White()}")));
             Add(new ContentView(Span($"Sql server:          {string.Join("; ", options.Server).DarkGrey()}")));
@@ -51,13 +48,14 @@ namespace SqlBackupUtil
             Formatter.AddFormatter<DateTime>(d => $"{d:d} {ForegroundColorSpan.DarkGray()}{d:t}");
         }
 
-        protected abstract void AddTableInformation();
+        protected TextSpanFormatter Formatter { get; } = new TextSpanFormatter();
+
         protected abstract void AddSummaryInformation();
+
+        protected abstract void AddTableInformation();
+
         protected TextSpan Span(FormattableString formattableString) => Formatter.ParseToSpan(formattableString);
 
         protected TextSpan Span(object obj) => Formatter.Format(obj);
-
-        protected TextSpanFormatter Formatter { get; } = new TextSpanFormatter();
     }
 }
-

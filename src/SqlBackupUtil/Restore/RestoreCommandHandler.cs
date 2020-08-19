@@ -40,6 +40,8 @@ namespace SqlBackupUtil
         {
             var settings = new BackupStoreSettings
             {
+                Login = _options.Login,
+                Password = _options.Password,
                 BackupFileExtensions = _options.BackupExtensions,
                 BackupPaths = _options.BackupDirectories
             };

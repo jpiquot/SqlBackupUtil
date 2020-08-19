@@ -4,9 +4,9 @@ using System.Data;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 
 using Microsoft.Extensions.Options;
+using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 
 namespace SqlBackup.Database
@@ -17,9 +17,9 @@ namespace SqlBackup.Database
         private readonly IOptions<BackupStoreSettings> _options;
         private readonly Server _server;
         private List<BackupDatabaseFile>? _backupDatabaseFiles;
+        private List<string>? _backupFiles;
         private List<BackupHeader>? _backupHeaders;
         private List<BackupMediaHeader>? _backupMediaHeaders;
-        private List<string>? _backupFiles;
 
         public BackupStore(Server server, IFileSystem fileSystem, IOptions<BackupStoreSettings> options)
         {
@@ -34,13 +34,53 @@ namespace SqlBackup.Database
             {
                 throw new ArgumentException(Properties.Resources.ArgumentIsNullOrWhitespace, nameof(serverName));
             }
-            _server = new Server(serverName);
+            string? login = options.Value.Login;
+            var con = new ServerConnection
+            {
+                ServerInstance = serverName
+            };
+            if (login != null)
+            {
+                con.LoginSecure = false;
+                con.Authentication = SqlConnectionInfo.AuthenticationMethod.SqlPassword;
+                con.Login = login;
+                con.Password = options.Value.Password;
+            }
+            _server = new Server(con);
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(_fileSystem));
         }
 
+        public List<BackupDatabaseFile> BackupDatabaseFiles => _backupDatabaseFiles ??= InitBackupDatabaseFiles();
+        public List<string> BackupFiles => _backupFiles ??= InitBackupFileNames();
         public List<BackupHeader> BackupHeaders => _backupHeaders ??= InitBackupHeaders();
         public List<BackupMediaHeader> BackupMediaHeaders => _backupMediaHeaders ??= InitBackupMediaHeaders();
+
+        public int FullBackupCount(string serverName, string databaseName) => GetFullBackupHeaders(serverName, databaseName).Count();
+
+        public IEnumerable<BackupHeader> GetBackupHeaders(string? serverName, string? databaseName, BackupType? type = null, DateTime? before = null)
+            => BackupHeaders.Where(p =>
+                (type == null || p.BackupType == type) &&
+                (string.IsNullOrEmpty(databaseName) || p.DatabaseName == databaseName) &&
+                (string.IsNullOrEmpty(serverName) || p.ServerName == serverName) &&
+                (before == null || p.StartDate == before)
+            ).ToList();
+
+        public IEnumerable<BackupHeader> GetDiffBackupHeaders(string? serverName, string? databaseName)
+            => GetBackupHeaders(serverName, databaseName, BackupType.Differential);
+
+        public IEnumerable<BackupHeader> GetFullBackupHeaders(string? serverName, string? databaseName)
+            => GetBackupHeaders(serverName, databaseName, BackupType.Full);
+
+        public BackupHeader GetFullForDiff(BackupHeader diff)
+        {
+            BackupHeader? full = GetFullBackupHeaders(diff.ServerName, diff.DatabaseName).Where(p => p.CheckpointLSN == diff.DatabaseBackupLSN).FirstOrDefault();
+            if (full == null)
+            {
+                throw new ApplicationException(string.Format(Properties.Resources.FullNotFoundForDiffBackup, diff.FileName));
+            }
+            return full;
+        }
 
         public IEnumerable<BackupHeader> GetLatestBackup(string serverName, string databaseName, BackupType? backupType, DateTime? before = null)
         {
@@ -61,11 +101,56 @@ namespace SqlBackup.Database
             };
         }
 
-        private IEnumerable<BackupHeader> GetAllForLog(BackupHeader latestBackup) => Array.Empty<BackupHeader>();
-        
+        public IEnumerable<BackupHeader> GetLatestDiffWithFull(string serverName, string databaseName, DateTime? before = null)
+        {
+            IEnumerable<BackupHeader>? headers = GetDiffBackupHeaders(serverName, databaseName);
+            var list = new List<BackupHeader>(2);
+            if (headers.Any())
+            {
+                decimal lsn;
+                if (before == null)
+                {
+                    lsn = headers.Max(p => p.LastLSN);
+                }
+                else
+                {
+                    lsn = headers.Where(p => p.StartDate < before).Max(p => p.LastLSN);
+                }
 
-        public List<BackupDatabaseFile> BackupDatabaseFiles => _backupDatabaseFiles ??= InitBackupDatabaseFiles();
-        public List<string> BackupFiles => _backupFiles ??= InitBackupFileNames();
+                BackupHeader? diff = headers.Where(p => p.LastLSN == lsn).First();
+                BackupHeader full = GetFullForDiff(diff);
+                list.Add(full);
+                list.Add(diff);
+                return list;
+            }
+            throw new ApplicationException(string.Format(Properties.Resources.DiffBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
+        }
+
+        public BackupHeader GetLatestFull(string serverName, string databaseName, DateTime? before = null)
+        {
+            IEnumerable<BackupHeader>? headers = GetFullBackupHeaders(serverName, databaseName);
+            if (headers.Any())
+            {
+                decimal lsn;
+                if (before == null)
+                {
+                    lsn = headers.Max(p => p.CheckpointLSN);
+                }
+                else
+                {
+                    lsn = headers.Where(p => p.StartDate < before).Max(p => p.CheckpointLSN);
+                }
+
+                return headers.Where(p => p.CheckpointLSN == lsn).First();
+            }
+            throw new ApplicationException(string.Format(Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
+        }
+
+        public IEnumerable<BackupHeader> GetLogBackupHeaders(string? serverName, string? databaseName)
+            => GetBackupHeaders(serverName, databaseName, BackupType.Log);
+
+        private IEnumerable<BackupHeader> GetAllForLog(BackupHeader latestBackup) => Array.Empty<BackupHeader>();
+
         private List<BackupDatabaseFile> InitBackupDatabaseFiles()
         {
             var list = new List<BackupDatabaseFile>(BackupFiles.Count);
@@ -73,28 +158,6 @@ namespace SqlBackup.Database
             {
                 var media = new BackupFile(_server, file);
                 list.AddRange(media.BackupDatabaseFiles);
-            }
-            return list;
-        }
-
-        private List<BackupMediaHeader> InitBackupMediaHeaders()
-        {
-            var list = new List<BackupMediaHeader>(BackupFiles.Count);
-            foreach (string file in BackupFiles)
-            {
-                var media = new BackupFile(_server, file);
-                list.AddRange(media.BackupMediaHeaders);
-            }
-            return list;
-        }
-
-        private List<BackupHeader> InitBackupHeaders()
-        {
-            var list = new List<BackupHeader>(BackupFiles.Count);
-            foreach (string file in BackupFiles)
-            {
-                var media = new BackupFile(_server, file);
-                list.AddRange(media.BackupHeaders);
             }
             return list;
         }
@@ -123,71 +186,26 @@ namespace SqlBackup.Database
             return list;
         }
 
-        public IEnumerable<BackupHeader> GetBackupHeaders(string? serverName, string? databaseName, BackupType? type = null, DateTime? before = null)
-            => BackupHeaders.Where(p =>
-                (type == null || p.BackupType == type) &&
-                (databaseName == null || p.DatabaseName == databaseName) &&
-                (serverName == null || p.ServerName == serverName) &&
-                (before == null || p.StartDate == before)
-            ).ToList();
-        public IEnumerable<BackupHeader> GetFullBackupHeaders(string? serverName, string? databaseName)
-            => GetBackupHeaders(serverName, databaseName, BackupType.Full);
-        public IEnumerable<BackupHeader> GetDiffBackupHeaders(string? serverName, string? databaseName)
-            => GetBackupHeaders(serverName, databaseName, BackupType.Differential);
-        public IEnumerable<BackupHeader> GetLogBackupHeaders(string? serverName, string? databaseName)
-            => GetBackupHeaders(serverName, databaseName, BackupType.Log);
-        public BackupHeader GetLatestFull(string serverName, string databaseName, DateTime? before = null)
+        private List<BackupHeader> InitBackupHeaders()
         {
-            IEnumerable<BackupHeader>? headers = GetFullBackupHeaders(serverName, databaseName);
-            if (headers.Any())
+            var list = new List<BackupHeader>(BackupFiles.Count);
+            foreach (string file in BackupFiles)
             {
-                decimal lsn;
-                if (before == null)
-                {
-                    lsn = headers.Max(p => p.CheckpointLSN);
-                }
-                else
-                {
-                    lsn = headers.Where(p => p.StartDate < before).Max(p => p.CheckpointLSN);
-                }
-
-                return headers.Where(p => p.CheckpointLSN == lsn).First();
+                var media = new BackupFile(_server, file);
+                list.AddRange(media.BackupHeaders);
             }
-            throw new ApplicationException(string.Format(Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
+            return list;
         }
-        public int FullBackupCount(string serverName, string databaseName) => GetFullBackupHeaders(serverName, databaseName).Count();
-        public IEnumerable<BackupHeader> GetLatestDiffWithFull(string serverName, string databaseName, DateTime? before = null)
-        {
-            IEnumerable<BackupHeader>? headers = GetDiffBackupHeaders(serverName, databaseName);
-            var list = new List<BackupHeader>(2);
-            if (headers.Any())
-            {
-                decimal lsn;
-                if (before == null)
-                {
-                    lsn = headers.Max(p => p.LastLSN);
-                }
-                else
-                {
-                    lsn = headers.Where(p => p.StartDate < before).Max(p => p.LastLSN);
-                }
 
-                BackupHeader? diff = headers.Where(p => p.LastLSN == lsn).First();
-                BackupHeader full = GetFullForDiff(diff);
-                list.Add(full);
-                list.Add(diff);
-                return list;
-            }
-            throw new ApplicationException(string.Format(Properties.Resources.DiffBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
-        }
-        public BackupHeader GetFullForDiff(BackupHeader diff)
+        private List<BackupMediaHeader> InitBackupMediaHeaders()
         {
-            BackupHeader? full = GetFullBackupHeaders(diff.ServerName, diff.DatabaseName).Where(p => p.CheckpointLSN == diff.DatabaseBackupLSN).FirstOrDefault();
-            if (full == null)
+            var list = new List<BackupMediaHeader>(BackupFiles.Count);
+            foreach (string file in BackupFiles)
             {
-                throw new ApplicationException(string.Format(Properties.Resources.FullNotFoundForDiffBackup, diff.FileName));
+                var media = new BackupFile(_server, file);
+                list.AddRange(media.BackupMediaHeaders);
             }
-            return full;
+            return list;
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SqlBackup.Database
 {
@@ -10,5 +6,7 @@ namespace SqlBackup.Database
     {
         public List<string> BackupFileExtensions { get; set; } = new List<string>();
         public List<string> BackupPaths { get; set; } = new List<string>();
+        public string? Login { get; set; }
+        public string? Password { get; set; }
     }
 }
