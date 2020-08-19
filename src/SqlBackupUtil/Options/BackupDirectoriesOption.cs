@@ -16,7 +16,7 @@ namespace SqlBackupUtil
         /// <param name="defaultValues">The default values.</param>
         public BackupDirectoriesOption(IOptions<SqlBackupSettings> defaultValues)
             : base(
-                  new[] { "--backup-extensions", "-be" },
+                  new[] { "--backup-directories", "-bd" },
                   () => defaultValues.Value.BackupDirectories?.ToArray() ?? new[] { "." },
                   "The backup files directories.")
         {

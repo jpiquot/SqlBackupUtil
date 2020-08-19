@@ -17,7 +17,7 @@ namespace SqlBackupUtil
         public ServerOption(IOptions<SqlBackupSettings> defaultValues)
             : base(
                   new[] { "--server", "-s" },
-                  () => defaultValues.Value.Server ?? string.Empty,
+                  () => defaultValues.Value?.Server ?? string.Empty,
                   "The name of the SQL Server used for the operation.")
         {
         }

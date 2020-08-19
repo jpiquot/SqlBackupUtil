@@ -52,7 +52,7 @@ namespace SqlBackupUtil
                         _consoleRenderer,
                         Options.Create
                         (
-                            Configuration.GetValue<SqlBackupSettings>(nameof(SqlBackupSettings))
+                            GetSettings()
                         )))
                 .UseDefaults()
                 .UseHost(_ => Host
@@ -73,7 +73,7 @@ namespace SqlBackupUtil
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true);
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLowerInvariant() == "development")
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLowerInvariant() != "production")
             {
                 builder.AddUserSecrets<Program>();
             }
@@ -94,10 +94,17 @@ namespace SqlBackupUtil
                         _invocationContext.Console,
                         OutputMode.Ansi,
                         true))
-                .Configure<SqlBackupSettings>(Configuration);
+                .Configure<SqlBackupSettings>(Configuration.GetSection(nameof(SqlBackupSettings)));
 
         private IServiceProvider ConfigureServices()
             => ConfigureServices(new ServiceCollection())
                 .BuildServiceProvider();
+
+        private SqlBackupSettings GetSettings()
+        {
+            SqlBackupSettings settings = new();
+            Configuration.Bind(nameof(SqlBackupSettings), settings);
+            return settings;
+        }
     }
 }

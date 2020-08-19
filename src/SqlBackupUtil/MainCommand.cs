@@ -30,13 +30,36 @@ namespace SqlBackupUtil
             AddGlobalOption(new SourceDatabaseOption(defaultValues));
             AddGlobalOption(new SourceServerOption(defaultValues));
 
-            var command = new CheckCommand(defaultValues)
+            Command command = new CheckCommand(defaultValues)
             {
                 Handler =
                 CommandHandler.Create<CheckOptions>
                 (
                     (options)
                         => new CheckCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
+                )
+            };
+
+            AddCommand(command);
+
+            command = new ListCommand(defaultValues)
+            {
+                Handler =
+                CommandHandler.Create<ListOptions>
+                (
+                    (options)
+                        => new ListCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
+                )
+            };
+
+            AddCommand(command);
+            command = new RestoreCommand(defaultValues)
+            {
+                Handler =
+                CommandHandler.Create<RestoreOptions>
+                (
+                    (options)
+                        => new RestoreCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
                 )
             };
 
