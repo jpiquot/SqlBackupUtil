@@ -10,8 +10,8 @@ namespace SqlBackup.Database
 {
     public class DatabaseRestore
     {
-        private readonly string _destinationDatabaseName;
         private readonly IEnumerable<BackupHeader> _backups;
+        private readonly string _destinationDatabaseName;
         private readonly Server _server;
         private Restore? _restore;
 
@@ -37,27 +37,18 @@ namespace SqlBackup.Database
         }
 
         private Restore Restore => _restore ??= InitRestore();
-        private Restore InitRestore()
-        {
-            var restore = new Restore()
-            {
-                Action = RestoreActionType.Database,
-                Database = _destinationDatabaseName,               
-                ReplaceDatabase = true
-            };
-            foreach (string fileName in _backups.Select(p => p.FileName).Distinct())
-            {
-                restore.Devices.Add(new BackupDeviceItem(fileName, DeviceType.File));
-            }
-            return restore;
-        }
+
         /// <summary>
         /// Execute the restore operation on the database
         /// </summary>
         public void Execute()
         {
-            foreach (DataRow file in Restore.ReadFileList(_server).Rows)
+            DataRowCollection? rows = Restore.ReadFileList(_server).Rows;
+            _ = rows ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
+
+            foreach (DataRow? file in rows)
             {
+                _ = file ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
                 Restore.RelocateFiles.Add(Relocate(file));
             }
             //Gets the exclusive access to database
@@ -66,21 +57,41 @@ namespace SqlBackup.Database
 
             Restore.SqlRestore(_server);
         }
-        private RelocateFile Relocate (DataRow row)
+
+        private Restore InitRestore()
         {
-            RelocateFile file = new ();
+            var restore = new Restore()
+            {
+                Action = RestoreActionType.Database,
+                Database = _destinationDatabaseName,
+                ReplaceDatabase = true
+            };
+            foreach (string fileName in _backups.Select(p => p.FileName).Distinct())
+            {
+                restore.Devices.Add(new BackupDeviceItem(fileName, DeviceType.File));
+            }
+            return restore;
+        }
+
+        private RelocateFile Relocate(DataRow? row)
+        {
+            if (row == null)
+            {
+                throw new ArgumentNullException(nameof(row));
+            }
+            RelocateFile file = new();
+
             if ((string)row[1] == "D")
             {
                 file.LogicalFileName = _destinationDatabaseName;
-                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName+".mdf");
+                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName + ".mdf");
             }
             else
             {
-                file.LogicalFileName = _destinationDatabaseName+"_log";
-                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName+"_log.ldf");
+                file.LogicalFileName = _destinationDatabaseName + "_log";
+                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName + "_log.ldf");
             }
             return file;
         }
-
     }
 }

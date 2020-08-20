@@ -70,6 +70,15 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve database files information..
+        /// </summary>
+        internal static string CorruptDatabaseFileInfo {
+            get {
+                return ResourceManager.GetString("CorruptDatabaseFileInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No diff backup found from server &apos;%1&apos;, for database &apos;%2&apos;, before %3..
         /// </summary>
         internal static string DiffBackupNotFound {

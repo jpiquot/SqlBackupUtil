@@ -129,4 +129,7 @@
   <data name="FullNotFoundForDiffBackup" xml:space="preserve">
     <value>The full backup was not found for differential : %1.</value>
   </data>
+  <data name="CorruptDatabaseFileInfo" xml:space="preserve">
+    <value>Failed to retrieve database files information.</value>
+  </data>
 </root>
