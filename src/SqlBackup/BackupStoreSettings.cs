@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public class BackupStoreSettings
     {

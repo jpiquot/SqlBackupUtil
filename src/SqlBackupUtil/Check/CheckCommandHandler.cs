@@ -5,7 +5,7 @@ using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
 using System.IO.Abstractions;
 
-using SqlBackup.Database;
+using SqlBackup;
 
 namespace SqlBackupUtil
 {

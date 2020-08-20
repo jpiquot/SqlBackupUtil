@@ -132,4 +132,10 @@
   <data name="CorruptDatabaseFileInfo" xml:space="preserve">
     <value>Failed to retrieve database files information.</value>
   </data>
+  <data name="InvalidColumn" xml:space="preserve">
+    <value>The table contains an invalid column.</value>
+  </data>
+  <data name="BackupFileTypeUnsupported" xml:space="preserve">
+    <value>The backup file type '%1' not supported.</value>
+  </data>
 </root>

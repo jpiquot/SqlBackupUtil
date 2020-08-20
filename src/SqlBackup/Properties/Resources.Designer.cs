@@ -70,6 +70,15 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The backup file type &apos;%1&apos; not supported..
+        /// </summary>
+        internal static string BackupFileTypeUnsupported {
+            get {
+                return ResourceManager.GetString("BackupFileTypeUnsupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve database files information..
         /// </summary>
         internal static string CorruptDatabaseFileInfo {
@@ -102,6 +111,15 @@ namespace SqlBackup.Properties {
         internal static string FullNotFoundForDiffBackup {
             get {
                 return ResourceManager.GetString("FullNotFoundForDiffBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The table contains an invalid column..
+        /// </summary>
+        internal static string InvalidColumn {
+            get {
+                return ResourceManager.GetString("InvalidColumn", resourceCulture);
             }
         }
     }

@@ -6,13 +6,14 @@ using System.Linq;
 
 using Microsoft.SqlServer.Management.Smo;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public class DatabaseRestore
     {
         private readonly IEnumerable<BackupHeader> _backups;
         private readonly string _destinationDatabaseName;
         private readonly Server _server;
+        private IEnumerable<DatabaseFileInfo>? _relocatedFiles;
         private Restore? _restore;
 
         /// <summary>
@@ -36,6 +37,7 @@ namespace SqlBackup.Database
             _backups = backups ?? throw new ArgumentNullException(nameof(backups));
         }
 
+        public IEnumerable<DatabaseFileInfo> RelocatedFiles => _relocatedFiles ??= InitRelocatedFiles();
         private Restore Restore => _restore ??= InitRestore();
 
         /// <summary>
@@ -43,19 +45,25 @@ namespace SqlBackup.Database
         /// </summary>
         public void Execute()
         {
-            DataRowCollection? rows = Restore.ReadFileList(_server).Rows;
-            _ = rows ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
-
-            foreach (DataRow? file in rows)
-            {
-                _ = file ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
-                Restore.RelocateFiles.Add(Relocate(file));
-            }
             //Gets the exclusive access to database
             _server.KillAllProcesses(_destinationDatabaseName);
             Restore.Wait();
 
             Restore.SqlRestore(_server);
+        }
+
+        private IEnumerable<DatabaseFileInfo> InitRelocatedFiles()
+        {
+            DataRowCollection? rows = Restore.ReadFileList(_server).Rows;
+            _ = rows ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
+            List<DatabaseFileInfo> files = new(rows.Count);
+            foreach (DataRow? file in rows)
+            {
+                _ = file ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
+                Restore.RelocateFiles.Add(Relocate(file));
+                files.Add(new DatabaseFileInfo(file.ToDictionary()));
+            }
+            return files;
         }
 
         private Restore InitRestore()

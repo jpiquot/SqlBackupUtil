@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 
-
 using Microsoft.SqlServer.Management.Smo;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public class BackupFile
     {
+        private readonly string _backupFile;
         private readonly Server _server;
         private List<BackupDatabaseFile>? _backupDatabaseFiles;
-        private readonly string _backupFile;
         private List<BackupHeader>? _backupHeaders;
         private List<BackupMediaHeader>? _backupMediaHeaders;
         private Restore? _restore;
@@ -27,16 +26,6 @@ namespace SqlBackup.Database
         public List<BackupMediaHeader> BackupMediaHeaders => _backupMediaHeaders ??= InitBackupMediaHeaders();
         public Restore Restore => _restore ??= InitRestore();
 
-        private List<BackupDatabaseFile> InitBackupDatabaseFiles()
-            => CreateList(Restore.ReadFileList(_server), (dict) => new BackupDatabaseFile(dict, _backupFile));
- 
-
-        private List<BackupHeader> InitBackupHeaders() 
-            => (Restore.Devices.Count > 0)? CreateList(Restore.ReadBackupHeader(_server), (dict) => new BackupHeader(dict, _backupFile)) : new List<BackupHeader>();
-
-        private List<BackupMediaHeader> InitBackupMediaHeaders() 
-            => (Restore.Devices.Count > 0) ? CreateList(Restore.ReadMediaHeader(_server), (dict) => new BackupMediaHeader(dict, _backupFile)) : new List<BackupMediaHeader>();
-
         private List<T> CreateList<T>(DataTable table, Func<Dictionary<string, object>, T> create)
         {
             var list = new List<T>(table.Rows.Count);
@@ -46,19 +35,19 @@ namespace SqlBackup.Database
                 {
                     continue;
                 }
-                var values = new Dictionary<string, object>();
-                foreach (DataColumn? column in table.Columns)
-                {
-                    if (column == null)
-                    {
-                        continue;
-                    }
-                    values.Add(column.ColumnName, row[column.Ordinal]);
-                }
-                list.Add(create(values));
+                list.Add(create(row.ToDictionary()));
             }
             return list;
         }
+
+        private List<BackupDatabaseFile> InitBackupDatabaseFiles()
+                    => CreateList(Restore.ReadFileList(_server), (dict) => new BackupDatabaseFile(dict, _backupFile));
+
+        private List<BackupHeader> InitBackupHeaders()
+            => (Restore.Devices.Count > 0) ? CreateList(Restore.ReadBackupHeader(_server), (dict) => new BackupHeader(dict, _backupFile)) : new List<BackupHeader>();
+
+        private List<BackupMediaHeader> InitBackupMediaHeaders()
+            => (Restore.Devices.Count > 0) ? CreateList(Restore.ReadMediaHeader(_server), (dict) => new BackupMediaHeader(dict, _backupFile)) : new List<BackupMediaHeader>();
 
         private Restore InitRestore()
         {

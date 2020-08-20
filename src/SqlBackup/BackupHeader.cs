@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using Microsoft.SqlServer.Management.Smo;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public class BackupHeader
     {
@@ -21,20 +21,19 @@ namespace SqlBackup.Database
 
         public string BackupName => (string)_values["BackupName"];
         public BackupType BackupType => GetType((byte)_values["BackupType"]);
+        public decimal CheckpointLSN => (decimal)_values["CheckpointLSN"];
+        public decimal DatabaseBackupLSN => (decimal)_values["DatabaseBackupLSN"];
         public string DatabaseName => (string)_values["DatabaseName"];
-        public string ServerName => (string)_values["ServerName"];
+        public string FileName { get; }
         public DateTime FinishDate => (DateTime)_values["BackupFinishDate"];
         public decimal FirstLSN => (decimal)_values["FirstLSN"];
         public decimal LastLSN => (decimal)_values["LastLSN"];
-        public decimal DatabaseBackupLSN => (decimal)_values["DatabaseBackupLSN"];
-        public decimal CheckpointLSN => (decimal)_values["CheckpointLSN"];
         public int Position => (short)_values["Position"];
+        public string ServerName => (string)_values["ServerName"];
         public int SoftwareVersionMajor => (int)_values["SoftwareVersionMajor"];
         public DateTime StartDate => (DateTime)_values["BackupStartDate"];
 
         public Dictionary<string, object> Values => new Dictionary<string, object>(_values);
-
-        public string FileName { get; }
 
         private static BackupType GetType(short type) => type switch
         {

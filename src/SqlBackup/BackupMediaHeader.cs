@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public class BackupMediaHeader
     {
@@ -13,9 +13,8 @@ namespace SqlBackup.Database
             FileName = fileName;
         }
 
-        public Guid MediaSetId => (Guid)_values["MediaSetId"];
-        public DateTime MediaDate => (DateTime)_values["MediaDate"];
-
         public string FileName { get; }
+        public DateTime MediaDate => (DateTime)_values["MediaDate"];
+        public Guid MediaSetId => (Guid)_values["MediaSetId"];
     }
 }

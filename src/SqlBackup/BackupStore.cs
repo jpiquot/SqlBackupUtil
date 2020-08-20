@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public class BackupStore
     {

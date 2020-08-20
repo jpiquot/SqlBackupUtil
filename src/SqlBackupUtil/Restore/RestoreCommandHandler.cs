@@ -7,7 +7,7 @@ using System.IO.Abstractions;
 
 using Microsoft.Extensions.Options;
 
-using SqlBackup.Database;
+using SqlBackup;
 
 namespace SqlBackupUtil
 {
@@ -60,12 +60,13 @@ namespace SqlBackupUtil
                     _ => null
                 });
 
-            var check = new RestoreView(backups, _options);
+            var restore = new DatabaseRestore(_options.Server, _options.Database, backups);
+
+            var check = new RestoreView(restore.RelocatedFiles, backups, _options);
 
             var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
             screen.Render();
 
-            var restore = new DatabaseRestore(_options.Server, _options.Database, backups);
             restore.Execute();
         }
     }

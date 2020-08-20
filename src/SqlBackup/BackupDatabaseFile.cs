@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public class BackupDatabaseFile
     {
@@ -13,9 +13,8 @@ namespace SqlBackup.Database
             FileName = fileName;
         }
 
+        public string FileName { get; }
         public string LogicalName => (string)_values["LogicalName"];
         public string PhysicalName => (string)_values["PhysicalName"];
-
-        public string FileName { get; }
     }
 }

@@ -2,7 +2,7 @@
 using System.CommandLine.Rendering.Views;
 using System.Linq;
 
-using SqlBackup.Database;
+using SqlBackup;
 
 namespace SqlBackupUtil
 {

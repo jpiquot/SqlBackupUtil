@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SqlBackup.Database
+namespace SqlBackup
 {
     public enum BackupType
     {

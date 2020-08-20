@@ -7,7 +7,7 @@ using System.IO.Abstractions;
 
 using Microsoft.Extensions.Options;
 
-using SqlBackup.Database;
+using SqlBackup;
 
 namespace SqlBackupUtil
 {

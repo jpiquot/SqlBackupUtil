@@ -4,7 +4,7 @@ using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
 using System.Linq;
 
-using SqlBackup.Database;
+using SqlBackup;
 
 namespace SqlBackupUtil
 {
@@ -13,15 +13,23 @@ namespace SqlBackupUtil
     /// </summary>
     internal class RestoreView : CommandView<BackupHeader, RestoreOptions>
     {
+        private readonly IEnumerable<DatabaseFileInfo> _relocatedFiles;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="backups">List of backup file headers</param>
         /// <param name="options"></param>
-        public RestoreView(IEnumerable<BackupHeader> backups, RestoreOptions options) : base(backups, options)
+        public RestoreView(IEnumerable<DatabaseFileInfo> relocatedFiles, IEnumerable<BackupHeader> backups, RestoreOptions options) : base(backups, options)
         {
+            _relocatedFiles = relocatedFiles;
+        }
 
-
+        protected override void AddSummaryInformation()
+        {
+            Add(new ContentView(Span($"Database:            {(_options.Database ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
         }
 
         protected override void AddTableInformation()
@@ -44,12 +52,5 @@ namespace SqlBackupUtil
                 cellValue: f => Span(f.FileName),
                 header: new ContentView("Backup file".Underline()));
         }
-        protected override void AddSummaryInformation()
-        {
-            Add(new ContentView(Span($"Database:            {(_options.Database ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
-        }
     }
 }
-

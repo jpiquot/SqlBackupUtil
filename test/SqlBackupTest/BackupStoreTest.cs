@@ -10,7 +10,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Microsoft.SqlServer.Management.Smo;
 
-using SqlBackup.Database;
+using SqlBackup;
 
 using Xunit;
 
@@ -143,62 +143,6 @@ namespace SqlBackupTest
         }
 
         [Fact]
-        public void GetLatestFull_ReturnFull2()
-        {
-            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
-
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
-
-            BackupHeader info = store.GetLatestFull("DESKTOP-NVACFK6", "Test");
-            info.Should().NotBeNull();
-            info.BackupType.Should().Be(BackupType.Full);
-            info.DatabaseName.Should().Be("Test");
-            info.BackupName.Should().Be("Test-Full Database Backup");
-            info.StartDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
-            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
-            info.FirstLSN.Should().Be(37000000136800001M);
-            info.LastLSN.Should().Be(37000000137100001M);
-            info.Position.Should().Be(1);
-            info.SoftwareVersionMajor.Should().Be(15);
-            info.Values.Count.Should().Be(56);
-        }
-
-        [Fact]
-        public void GetLatestDiffWithFull_ReturnFull1Diff2()
-        {
-            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
-
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
-
-            IEnumerable<BackupHeader> infos = store.GetLatestDiffWithFull("DESKTOP-NVACFK6", "Test");
-            infos.Should().HaveCount(2);
-            BackupHeader info = infos.First();
-            info.Should().NotBeNull();
-            info.BackupType.Should().Be(BackupType.Full);
-            info.DatabaseName.Should().Be("Test");
-            info.BackupName.Should().Be("Test-Full Database Backup");
-            info.StartDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
-            info.FinishDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
-            info.FirstLSN.Should().Be(37000000091400001M);
-            info.LastLSN.Should().Be(37000000091700001M);
-            info.Position.Should().Be(1);
-            info.SoftwareVersionMajor.Should().Be(15);
-            info.Values.Count.Should().Be(56);
-            info = infos.Last();
-            info.Should().NotBeNull();
-            info.BackupType.Should().Be(BackupType.Differential);
-            info.DatabaseName.Should().Be("Test");
-            info.BackupName.Should().Be("Test-Diff Database Backup");
-            info.StartDate.Should().Be(new DateTime(2020, 8, 3, 14, 47, 32));
-            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 14, 47, 32));
-            info.FirstLSN.Should().Be(37000000133600001M);
-            info.LastLSN.Should().Be(37000000133900001M);
-            info.Position.Should().Be(2);
-            info.SoftwareVersionMajor.Should().Be(15);
-            info.Values.Count.Should().Be(56);
-        }
-
-        [Fact]
         public void BackupMediaHeaders_ShouldReturnFullMediaHeader()
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
@@ -252,6 +196,62 @@ namespace SqlBackupTest
             backupFiles.Should().BeEmpty();
         }
 
+        [Fact]
+        public void GetLatestDiffWithFull_ReturnFull1Diff2()
+        {
+            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
+
+            var store = new BackupStore(GetServer(), new FileSystem(), options);
+
+            IEnumerable<BackupHeader> infos = store.GetLatestDiffWithFull("DESKTOP-NVACFK6", "Test");
+            infos.Should().HaveCount(2);
+            BackupHeader info = infos.First();
+            info.Should().NotBeNull();
+            info.BackupType.Should().Be(BackupType.Full);
+            info.DatabaseName.Should().Be("Test");
+            info.BackupName.Should().Be("Test-Full Database Backup");
+            info.StartDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
+            info.FinishDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
+            info.FirstLSN.Should().Be(37000000091400001M);
+            info.LastLSN.Should().Be(37000000091700001M);
+            info.Position.Should().Be(1);
+            info.SoftwareVersionMajor.Should().Be(15);
+            info.Values.Count.Should().Be(56);
+            info = infos.Last();
+            info.Should().NotBeNull();
+            info.BackupType.Should().Be(BackupType.Differential);
+            info.DatabaseName.Should().Be("Test");
+            info.BackupName.Should().Be("Test-Diff Database Backup");
+            info.StartDate.Should().Be(new DateTime(2020, 8, 3, 14, 47, 32));
+            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 14, 47, 32));
+            info.FirstLSN.Should().Be(37000000133600001M);
+            info.LastLSN.Should().Be(37000000133900001M);
+            info.Position.Should().Be(2);
+            info.SoftwareVersionMajor.Should().Be(15);
+            info.Values.Count.Should().Be(56);
+        }
+
+        [Fact]
+        public void GetLatestFull_ReturnFull2()
+        {
+            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
+
+            var store = new BackupStore(GetServer(), new FileSystem(), options);
+
+            BackupHeader info = store.GetLatestFull("DESKTOP-NVACFK6", "Test");
+            info.Should().NotBeNull();
+            info.BackupType.Should().Be(BackupType.Full);
+            info.DatabaseName.Should().Be("Test");
+            info.BackupName.Should().Be("Test-Full Database Backup");
+            info.StartDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
+            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
+            info.FirstLSN.Should().Be(37000000136800001M);
+            info.LastLSN.Should().Be(37000000137100001M);
+            info.Position.Should().Be(1);
+            info.SoftwareVersionMajor.Should().Be(15);
+            info.Values.Count.Should().Be(56);
+        }
+
         private static MockFileSystem GetFileSystem()
             => new MockFileSystem(new Dictionary<string, MockFileData>
             {
@@ -268,7 +268,5 @@ namespace SqlBackupTest
             });
 
         private static Server GetServer() => new Server(TestSettings.SqlServerName);
-
-        
     }
 }
