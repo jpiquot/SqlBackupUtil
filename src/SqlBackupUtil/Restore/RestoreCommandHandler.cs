@@ -62,9 +62,10 @@ namespace SqlBackupUtil
 
             var restore = new DatabaseRestore(_options.Server, _options.Database, backups);
 
-            var check = new RestoreView(restore.RelocatedFiles, backups, _options);
+            var view = new RestoreView(restore.RelocatedFiles, backups, _options);
+            view.Initialize();
 
-            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
+            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = view };
             screen.Render();
 
             restore.Execute();

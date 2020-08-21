@@ -76,7 +76,7 @@ namespace SqlBackup
             };
             foreach (string fileName in _backups.Select(p => p.FileName).Distinct())
             {
-                restore.Devices.Add(new BackupDeviceItem(fileName, DeviceType.File));
+                restore.Devices.Add(new BackupDeviceItem(fileName, Microsoft.SqlServer.Management.Smo.DeviceType.File));
             }
             return restore;
         }

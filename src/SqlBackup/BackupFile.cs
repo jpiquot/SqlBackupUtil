@@ -52,7 +52,7 @@ namespace SqlBackup
         private Restore InitRestore()
         {
             var restore = new Restore();
-            restore.Devices.AddDevice(_backupFile, DeviceType.File);
+            restore.Devices.AddDevice(_backupFile, Microsoft.SqlServer.Management.Smo.DeviceType.File);
             return restore;
         }
     }

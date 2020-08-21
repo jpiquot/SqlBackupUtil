@@ -85,7 +85,7 @@ namespace SqlBackup
         public IEnumerable<BackupHeader> GetLatestBackup(string serverName, string databaseName, BackupType? backupType, DateTime? before = null)
         {
             BackupHeader? latestBackup = GetBackupHeaders(serverName, databaseName, backupType, before)
-                .Where(p => p.BackupType != BackupType.NotSupported)
+                .Where(p => p.BackupType == BackupType.Full || p.BackupType == BackupType.Differential || p.BackupType == BackupType.Log)
                 .OrderByDescending(p => p.StartDate)
                 .FirstOrDefault();
             if (latestBackup == null)

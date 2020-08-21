@@ -101,7 +101,7 @@ namespace SqlBackupTest
             info.DatabaseName.Should().Be("Test");
             info.BackupName.Should().Be("Test-Diff Database Backup");
             info.StartDate.Should().Be(new DateTime(2020, 7, 27, 9, 32, 5));
-            info.FinishDate.Should().Be(new DateTime(2020, 7, 27, 9, 32, 5));
+            info.BackupFinishDate.Should().Be(new DateTime(2020, 7, 27, 9, 32, 5));
             info.FirstLSN.Should().Be(37000000102900001M);
             info.LastLSN.Should().Be(37000000103200001M);
             info.Position.Should().Be(1);
@@ -112,7 +112,7 @@ namespace SqlBackupTest
             info.DatabaseName.Should().Be("Test");
             info.BackupName.Should().Be("Test-Full Database Backup");
             info.StartDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
-            info.FinishDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
+            info.BackupFinishDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
             info.FirstLSN.Should().Be(37000000091400001M);
             info.LastLSN.Should().Be(37000000091700001M);
             info.Position.Should().Be(1);
@@ -123,7 +123,7 @@ namespace SqlBackupTest
             info.DatabaseName.Should().Be("Test");
             info.BackupName.Should().Be("Test-Full Database Backup");
             info.StartDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
-            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
+            info.BackupFinishDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
             info.FirstLSN.Should().Be(37000000136800001M);
             info.LastLSN.Should().Be(37000000137100001M);
             info.Position.Should().Be(1);
@@ -134,7 +134,7 @@ namespace SqlBackupTest
             info.DatabaseName.Should().Be("Test");
             info.BackupName.Should().Be("Test-Log Database Backup");
             info.StartDate.Should().Be(new DateTime(2020, 8, 3, 12, 19, 56));
-            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 12, 19, 56));
+            info.BackupFinishDate.Should().Be(new DateTime(2020, 8, 3, 12, 19, 56));
             info.FirstLSN.Should().Be(37000000019700001M);
             info.LastLSN.Should().Be(37000000128700001M);
             info.Position.Should().Be(1);
@@ -211,7 +211,7 @@ namespace SqlBackupTest
             info.DatabaseName.Should().Be("Test");
             info.BackupName.Should().Be("Test-Full Database Backup");
             info.StartDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
-            info.FinishDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
+            info.BackupFinishDate.Should().Be(new DateTime(2020, 7, 25, 12, 45, 00));
             info.FirstLSN.Should().Be(37000000091400001M);
             info.LastLSN.Should().Be(37000000091700001M);
             info.Position.Should().Be(1);
@@ -223,7 +223,7 @@ namespace SqlBackupTest
             info.DatabaseName.Should().Be("Test");
             info.BackupName.Should().Be("Test-Diff Database Backup");
             info.StartDate.Should().Be(new DateTime(2020, 8, 3, 14, 47, 32));
-            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 14, 47, 32));
+            info.BackupFinishDate.Should().Be(new DateTime(2020, 8, 3, 14, 47, 32));
             info.FirstLSN.Should().Be(37000000133600001M);
             info.LastLSN.Should().Be(37000000133900001M);
             info.Position.Should().Be(2);
@@ -244,7 +244,7 @@ namespace SqlBackupTest
             info.DatabaseName.Should().Be("Test");
             info.BackupName.Should().Be("Test-Full Database Backup");
             info.StartDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
-            info.FinishDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
+            info.BackupFinishDate.Should().Be(new DateTime(2020, 8, 3, 16, 15, 53));
             info.FirstLSN.Should().Be(37000000136800001M);
             info.LastLSN.Should().Be(37000000137100001M);
             info.Position.Should().Be(1);

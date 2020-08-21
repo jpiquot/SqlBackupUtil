@@ -24,31 +24,34 @@ namespace SqlBackupUtil
         /// <param name="options"></param>
         public CommandView(IEnumerable<TItems> backups, TOptions options)
         {
-            _backups = backups;
-            _options = options;
+            _backups = backups ?? throw new ArgumentNullException(nameof(backups));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _tableView = new TableView<TItems>();
+        }
+
+        protected TextSpanFormatter Formatter { get; } = new TextSpanFormatter();
+
+        public virtual void Initialize()
+        {
             Add(new ContentView("\n"));
             Add(new ContentView(Span($"Sql backup utility V{Assembly.GetExecutingAssembly().GetName().Version}".Orange())));
             Add(new ContentView(Span($"Jérôme Piquot".DarkOrange())));
             Add(new ContentView("\n"));
-            Add(new ContentView(Span($"Command:             {string.Join("; ", options.Command).White()}")));
-            Add(new ContentView(Span($"Sql server:          {string.Join("; ", options.Server).DarkGrey()}")));
+            Add(new ContentView(Span($"Command:             {string.Join("; ", _options.Command).White()}")));
+            Add(new ContentView(Span($"Sql server:          {string.Join("; ", _options.Server).DarkGrey()}")));
             Add(new ContentView("\n"));
-            Add(new ContentView(Span($"Backup directories:  {string.Join("; ", options.BackupDirectories).DarkGrey()}")));
-            Add(new ContentView(Span($"Backup extensions:   {string.Join("; ", options.BackupExtensions).DarkGrey()}")));
-            Add(new ContentView(Span($"Backup type:         {options.BackupType.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Backup directories:  {string.Join("; ", _options.BackupDirectories).DarkGrey()}")));
+            Add(new ContentView(Span($"Backup extensions:   {string.Join("; ", _options.BackupExtensions).DarkGrey()}")));
+            Add(new ContentView(Span($"Backup type:         {_options.BackupType.ToString().DarkGrey()}")));
             AddSummaryInformation();
             Add(new ContentView("\n"));
-            _tableView = new TableView<TItems>();
-            if (backups.Any())
+            if (_backups.Any())
             {
-                AddTableInformation();
-
                 Add(_tableView);
+                AddTableInformation();
             }
             Formatter.AddFormatter<DateTime>(d => $"{d:d} {ForegroundColorSpan.DarkGray()}{d:t}");
         }
-
-        protected TextSpanFormatter Formatter { get; } = new TextSpanFormatter();
 
         protected abstract void AddSummaryInformation();
 

@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SqlBackup
+﻿namespace SqlBackup
 {
     public enum BackupType
     {
-        NotSupported,
-        Full,
-        Differential,
-        Log
+        Full = 1,
+        Log = 2,
+        File = 4,
+        Differential = 5,
+        DifferentialFile = 6,
+        Partial = 7,
+        DifferentialPartial = 8
     }
 }

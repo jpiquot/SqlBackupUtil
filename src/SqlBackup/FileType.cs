@@ -3,6 +3,8 @@
     public enum FileType
     {
         Data,
-        Log
+        Log,
+        FullText,
+        Stream
     }
 }
