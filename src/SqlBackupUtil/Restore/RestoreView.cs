@@ -25,11 +25,18 @@ namespace SqlBackupUtil
             : base(backups, options)
             => _relocatedFiles = relocatedFiles ?? throw new ArgumentNullException(nameof(relocatedFiles));
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            AddRelocatedFilesTable();
+        }
+
         protected override void AddSummaryInformation()
         {
             Add(new ContentView(Span($"Database:            {(_options.Database ?? "All").DarkGrey()}")));
             Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
             Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"\nBackup Media".Orange())));
         }
 
         protected override void AddTableInformation()
@@ -51,11 +58,11 @@ namespace SqlBackupUtil
             _tableView.AddColumn(
                 cellValue: f => Span(f.FileName),
                 header: new ContentView("Backup file".Underline()));
-            AddRelocatedFilesTable();
         }
 
         private void AddRelocatedFilesTable()
         {
+            Add(new ContentView(Span($"\nDatbase Files".Orange())));
             _tableView2 = new TableView<DatabaseFileInfo>();
             Add(_tableView2);
             if (_relocatedFiles.Any())

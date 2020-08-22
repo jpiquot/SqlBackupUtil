@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.IO.Abstractions;
 using System.Linq;
 
 using Microsoft.Extensions.Options;
@@ -13,22 +11,22 @@ namespace SqlBackup
 {
     public class BackupStore
     {
-        private readonly IFileSystem _fileSystem;
+        private readonly IDirectoryService _directory;
         private readonly IOptions<BackupStoreSettings> _options;
         private readonly Server _server;
         private List<BackupDatabaseFile>? _backupDatabaseFiles;
-        private List<string>? _backupFiles;
+        private IEnumerable<string>? _backupFiles;
         private List<BackupHeader>? _backupHeaders;
         private List<BackupMediaHeader>? _backupMediaHeaders;
 
-        public BackupStore(Server server, IFileSystem fileSystem, IOptions<BackupStoreSettings> options)
+        public BackupStore(Server server, IOptions<BackupStoreSettings> options, IDirectoryService? directory = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _server = server ?? throw new ArgumentNullException(nameof(server));
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(_fileSystem));
+            _directory = directory ?? new SqlDirectoryService(server.InstanceName, options.Value.Login, options.Value.Password);
         }
 
-        public BackupStore(string serverName, IFileSystem fileSystem, IOptions<BackupStoreSettings> options)
+        public BackupStore(string serverName, IOptions<BackupStoreSettings> options, IDirectoryService? directory = null)
         {
             if (string.IsNullOrWhiteSpace(serverName))
             {
@@ -48,11 +46,17 @@ namespace SqlBackup
             }
             _server = new Server(con);
             _options = options ?? throw new ArgumentNullException(nameof(options));
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(_fileSystem));
+            _directory = directory ?? new SqlDirectoryService(serverName, options.Value.Login, options.Value.Password);
         }
 
         public List<BackupDatabaseFile> BackupDatabaseFiles => _backupDatabaseFiles ??= InitBackupDatabaseFiles();
-        public List<string> BackupFiles => _backupFiles ??= InitBackupFileNames();
+
+        public IEnumerable<string> BackupFiles
+            => _backupFiles ??= _directory
+                .GetFilesAsync(_options.Value.BackupPaths, _options.Value.BackupFileExtensions, true)
+                .GetAwaiter()
+                .GetResult();
+
         public List<BackupHeader> BackupHeaders => _backupHeaders ??= InitBackupHeaders();
         public List<BackupMediaHeader> BackupMediaHeaders => _backupMediaHeaders ??= InitBackupMediaHeaders();
 
@@ -153,7 +157,7 @@ namespace SqlBackup
 
         private List<BackupDatabaseFile> InitBackupDatabaseFiles()
         {
-            var list = new List<BackupDatabaseFile>(BackupFiles.Count);
+            var list = new List<BackupDatabaseFile>(BackupFiles.Count());
             foreach (string file in BackupFiles)
             {
                 var media = new BackupFile(_server, file);
@@ -162,33 +166,9 @@ namespace SqlBackup
             return list;
         }
 
-        private List<string> InitBackupFileNames()
-        {
-            string[] extensions = _options.Value.BackupFileExtensions.Select(p => p.ToUpperInvariant()).ToArray();
-            var list = new List<string>();
-            foreach (string path in _options.Value.BackupPaths)
-            {
-                foreach (string extension in _options.Value.BackupFileExtensions)
-                {
-                    list.AddRange(_fileSystem
-                        .Directory
-                        .EnumerateFiles(
-                                path,
-                                "*." + extension,
-                                new EnumerationOptions
-                                {
-                                    RecurseSubdirectories = true,
-                                    MatchType = MatchType.Simple,
-                                    MatchCasing = MatchCasing.CaseInsensitive
-                                }));
-                }
-            }
-            return list;
-        }
-
         private List<BackupHeader> InitBackupHeaders()
         {
-            var list = new List<BackupHeader>(BackupFiles.Count);
+            var list = new List<BackupHeader>(BackupFiles.Count());
             foreach (string file in BackupFiles)
             {
                 var media = new BackupFile(_server, file);
@@ -199,7 +179,7 @@ namespace SqlBackup
 
         private List<BackupMediaHeader> InitBackupMediaHeaders()
         {
-            var list = new List<BackupMediaHeader>(BackupFiles.Count);
+            var list = new List<BackupMediaHeader>(BackupFiles.Count());
             foreach (string file in BackupFiles)
             {
                 var media = new BackupFile(_server, file);

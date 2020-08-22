@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 
 using FluentAssertions;
@@ -23,7 +21,7 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
 
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
+            var store = new BackupStore(GetServer(), options);
 
             List<BackupDatabaseFile> backupFiles = store.BackupDatabaseFiles;
             backupFiles.Should().HaveCount(10);
@@ -64,9 +62,9 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"c:\backup\fullbak" } });
 
-            var store = new BackupStore(GetServer(), GetFileSystem(), options);
+            var store = new BackupStore(GetServer(), options, GetDirectory());
 
-            List<string> backupFiles = store.BackupFiles;
+            IEnumerable<string> backupFiles = store.BackupFiles;
             backupFiles.Should().HaveCount(1);
             backupFiles.Should().Contain(@"c:\backup\fullbak\backfile1.bak");
         }
@@ -76,9 +74,9 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
 
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
+            var store = new BackupStore(GetServer(), options);
 
-            List<string> backupFiles = store.BackupFiles;
+            IEnumerable<string> backupFiles = store.BackupFiles;
             backupFiles.Should().HaveCount(5);
             backupFiles.Should().ContainMatch(@"*TestFull1.bak");
             backupFiles.Should().ContainMatch(@"*TestFull2.bak");
@@ -92,7 +90,7 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
 
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
+            var store = new BackupStore(GetServer(), options);
 
             List<BackupHeader> backupHeaders = store.BackupHeaders;
             backupHeaders.Should().HaveCount(6);
@@ -147,7 +145,7 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
 
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
+            var store = new BackupStore(GetServer(), options);
 
             List<BackupMediaHeader> backupMediaHeaders = store.BackupMediaHeaders;
             backupMediaHeaders.Should().HaveCount(5);
@@ -173,9 +171,9 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\" } });
 
-            var store = new BackupStore(GetServer(), GetFileSystem(), options);
+            var store = new BackupStore(GetServer(), options, GetDirectory());
 
-            List<string> backupFiles = store.BackupFiles;
+            IEnumerable<string> backupFiles = store.BackupFiles;
             backupFiles.Should().HaveCount(5);
             backupFiles.Should().Contain(@"c:\backfile1.bak");
             backupFiles.Should().Contain(@"c:\backup\backfile1.bak");
@@ -187,12 +185,16 @@ namespace SqlBackupTest
         [Fact]
         public void GetFileNames_MockFsEmpty_ShouldReturnEmptyList()
         {
-            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
+            var directoryService = new SqlBackup.Fakes.StubIDirectoryService()
+            {
+                GetFilesIEnumerableOfStringIEnumerableOfStringBoolean =
+                    (paths, extensions, recurse) => Array.Empty<string>()
+            };
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\" } });
 
-            var store = new BackupStore(GetServer(), fileSystem, options);
+            var store = new BackupStore(GetServer(), options, directoryService);
 
-            List<string> backupFiles = store.BackupFiles;
+            IEnumerable<string> backupFiles = store.BackupFiles;
             backupFiles.Should().BeEmpty();
         }
 
@@ -201,7 +203,7 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
 
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
+            var store = new BackupStore(GetServer(), options);
 
             IEnumerable<BackupHeader> infos = store.GetLatestDiffWithFull("DESKTOP-NVACFK6", "Test");
             infos.Should().HaveCount(2);
@@ -236,7 +238,7 @@ namespace SqlBackupTest
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
 
-            var store = new BackupStore(GetServer(), new FileSystem(), options);
+            var store = new BackupStore(GetServer(), options);
 
             BackupHeader info = store.GetLatestFull("DESKTOP-NVACFK6", "Test");
             info.Should().NotBeNull();
@@ -252,20 +254,49 @@ namespace SqlBackupTest
             info.Values.Count.Should().Be(56);
         }
 
-        private static MockFileSystem GetFileSystem()
-            => new MockFileSystem(new Dictionary<string, MockFileData>
+        private static IDirectoryService GetDirectory()
+            => new SqlBackup.Fakes.StubIDirectoryService()
             {
-                { @"c:\textfile1.txt", new MockFileData("Not a backup") },
-                { @"c:\backfile1.bak", new MockFileData("A backup") },
-                { @"c:\backup\textfile1.txt", new MockFileData("Not a backup") },
-                { @"c:\backup\backfile1.bak", new MockFileData("A backup") },
-                { @"c:\backup\fullbak\textfile1.txt", new MockFileData("Not a backup") },
-                { @"c:\backup\fullbak\backfile1.bak", new MockFileData("A backup") },
-                { @"c:\backup\diffbak\textfile1.txt", new MockFileData("Not a backup") },
-                { @"c:\backup\diffbak\backfile1.bak", new MockFileData("A backup") },
-                { @"c:\backup\logbak\textfile1.txt", new MockFileData("Not a backup") },
-                { @"c:\backup\logbak\backfile1.bak", new MockFileData("A backup") },
-            });
+                GetFilesIEnumerableOfStringIEnumerableOfStringBoolean =
+                 (paths, extensions, recurse) =>
+                 {
+                     var dir = new List<string>()
+                        {
+                            @"c:\textfile1.txt",
+                            @"c:\backfile1.bak",
+                            @"c:\backup\textfile1.txt",
+                            @"c:\backup\backfile1.bak",
+                            @"c:\backup\fullbak\textfile1.txt",
+                            @"c:\backup\fullbak\backfile1.bak",
+                            @"c:\backup\diffbak\textfile1.txt",
+                            @"c:\backup\diffbak\backfile1.bak",
+                            @"c:\backup\logbak\textfile1.txt",
+                            @"c:\backup\logbak\backfile1.bak"
+                        };
+                     if (paths.Any())
+                     {
+                         var filtered = new List<string>();
+                         foreach (string path in paths)
+                         {
+                             if (extensions.Any())
+                             {
+                                 foreach (string ext in extensions)
+                                 {
+                                     filtered.AddRange(dir
+                                         .Where(p =>
+                                            p.StartsWith(path, StringComparison.InvariantCultureIgnoreCase) &&
+                                            p.EndsWith("." + ext, StringComparison.InvariantCultureIgnoreCase)));
+                                 }
+                             }
+                             else
+                             {
+                                 filtered.AddRange(dir.Where(p => p.StartsWith(path, StringComparison.InvariantCultureIgnoreCase)));
+                             }
+                         }
+                     }
+                     return dir;
+                 }
+            };
 
         private static Server GetServer() => new Server(TestSettings.SqlServerName);
     }

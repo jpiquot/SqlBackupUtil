@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
-using System.IO.Abstractions;
 
 using Microsoft.Extensions.Options;
 
@@ -45,7 +44,7 @@ namespace SqlBackupUtil
                 BackupFileExtensions = _options.BackupExtensions,
                 BackupPaths = _options.BackupDirectories
             };
-            var store = new BackupStore(_options.Server, new FileSystem(), Options.Create(settings));
+            var store = new BackupStore(_options.Server, Options.Create(settings));
             _ = _options.SourceServer ?? throw new NotSupportedException("The source server must be defined.");
             _ = _options.SourceDatabase ?? throw new NotSupportedException("The source database must be defined.");
             IEnumerable<BackupHeader> backups = store.GetLatestBackup

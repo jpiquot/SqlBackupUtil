@@ -44,7 +44,6 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Backup extensions:   {string.Join("; ", _options.BackupExtensions).DarkGrey()}")));
             Add(new ContentView(Span($"Backup type:         {_options.BackupType.ToString().DarkGrey()}")));
             AddSummaryInformation();
-            Add(new ContentView("\n"));
             if (_backups.Any())
             {
                 Add(_tableView);

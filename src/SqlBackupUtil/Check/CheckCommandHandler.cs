@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
-using System.IO.Abstractions;
 
 using SqlBackup;
 
@@ -31,7 +30,8 @@ namespace SqlBackupUtil
                 BackupFileExtensions = _options.BackupExtensions,
                 BackupPaths = _options.BackupDirectories
             };
-            var store = new BackupStore(_options.Server, new FileSystem(), Microsoft.Extensions.Options.Options.Create(settings));
+            var options = Microsoft.Extensions.Options.Options.Create(settings);
+            var store = new BackupStore(_options.Server, options);
 
             IEnumerable<BackupHeader>? backups = store.GetBackupHeaders
                 (
