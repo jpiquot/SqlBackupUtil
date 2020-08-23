@@ -28,7 +28,14 @@ namespace SqlBackupUtil
         public override void Initialize()
         {
             base.Initialize();
-            AddRelocatedFilesTable();
+            if (_relocatedFiles.Any())
+            {
+                AddRelocatedFilesTable();
+            }
+            if (!_backups.Any())
+            {
+                Add(new ContentView(Span("Error : No backups are defined for the restore operation.".LightRed())));
+            }
         }
 
         protected override void AddSummaryInformation()
@@ -36,11 +43,15 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Database:            {(_options.Database ?? "All").DarkGrey()}")));
             Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
             Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"\nBackup Media".Orange())));
         }
 
         protected override void AddTableInformation()
         {
+            if (_tableView == null)
+            {
+                return;
+            }
+            Add(new ContentView(Span($"\nBackup Media".Orange())));
             _tableView.Items = (from s in _backups orderby s.ServerName, s.DatabaseName, s.StartDate select s).ToList();
 
             _tableView.AddColumn(

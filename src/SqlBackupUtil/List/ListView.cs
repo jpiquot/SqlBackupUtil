@@ -16,14 +16,22 @@ namespace SqlBackupUtil
         /// </summary>
         /// <param name="backups">List of backup file headers</param>
         /// <param name="options"></param>
-        public ListView(IEnumerable<BackupHeader> backups, ListOptions options):base(backups, options)
+        public ListView(IEnumerable<BackupHeader> backups, ListOptions options) : base(backups, options)
         {
+        }
 
-  
+        protected override void AddSummaryInformation()
+        {
+            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
         }
 
         protected override void AddTableInformation()
         {
+            if (_tableView == null)
+            {
+                return;
+            }
             _tableView.Items = (from s in _backups orderby s.ServerName, s.DatabaseName, s.StartDate select s).ToList();
 
             _tableView.AddColumn(
@@ -62,11 +70,5 @@ namespace SqlBackupUtil
                 cellValue: f => Span(f.FileName),
                 header: new ContentView("Backup file".Underline()));
         }
-        protected override void AddSummaryInformation()
-        {
-            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
-        }
     }
 }
-

@@ -70,7 +70,7 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The backup file type &apos;%1&apos; not supported..
+        ///   Looks up a localized string similar to The backup file type &apos;{0}&apos; not supported..
         /// </summary>
         internal static string BackupFileTypeUnsupported {
             get {
@@ -88,7 +88,7 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No diff backup found from server &apos;%1&apos;, for database &apos;%2&apos;, before %3..
+        ///   Looks up a localized string similar to No diff backup found from server &apos;{0}&apos;, for database &apos;{1}&apos;, before {2}..
         /// </summary>
         internal static string DiffBackupNotFound {
             get {
@@ -97,7 +97,16 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No full backup found from server &apos;%1&apos;, for database &apos;%2&apos;, before %3..
+        ///   Looks up a localized string similar to The database file type &apos;{0}&apos; is not supported..
+        /// </summary>
+        internal static string FileTypeNotSupported {
+            get {
+                return ResourceManager.GetString("FileTypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No full backup found from server &apos;{0}&apos;, for database &apos;{1}&apos;, before {2}..
         /// </summary>
         internal static string FullBackupNotFound {
             get {
@@ -106,7 +115,7 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The full backup was not found for differential : %1..
+        ///   Looks up a localized string similar to The full backup was not found for differential : {0}..
         /// </summary>
         internal static string FullNotFoundForDiffBackup {
             get {
@@ -120,6 +129,15 @@ namespace SqlBackup.Properties {
         internal static string InvalidColumn {
             get {
                 return ResourceManager.GetString("InvalidColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No backup files given for the restore operation..
+        /// </summary>
+        internal static string NoBackupFileToRestore {
+            get {
+                return ResourceManager.GetString("NoBackupFileToRestore", resourceCulture);
             }
         }
     }

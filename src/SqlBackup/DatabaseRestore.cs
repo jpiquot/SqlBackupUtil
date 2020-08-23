@@ -35,6 +35,10 @@ namespace SqlBackup
             _server = new Server(serverName);
             _destinationDatabaseName = destinationDatabaseName;
             _backups = backups ?? throw new ArgumentNullException(nameof(backups));
+            if (!_backups.Any())
+            {
+                throw new InvalidOperationException(Properties.Resources.NoBackupFileToRestore);
+            }
         }
 
         public IEnumerable<DatabaseFileInfo> RelocatedFiles => _relocatedFiles ??= InitRelocatedFiles();
@@ -57,11 +61,15 @@ namespace SqlBackup
             DataRowCollection? rows = Restore.ReadFileList(_server).Rows;
             _ = rows ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
             List<DatabaseFileInfo> files = new(rows.Count);
-            foreach (DataRow? file in rows)
+            if (!_server.Databases.Contains(_destinationDatabaseName))
             {
-                _ = file ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
-                Restore.RelocateFiles.Add(Relocate(file));
-                files.Add(new DatabaseFileInfo(file.ToDictionary()));
+                foreach (DataRow? file in rows)
+                {
+                    _ = file ?? throw new FailedOperationException(Properties.Resources.CorruptDatabaseFileInfo);
+                    var info = new DatabaseFileInfo(file.ToDictionary());
+                    Restore.RelocateFiles.Add(Relocate(info));
+                    files.Add(info);
+                }
             }
             return files;
         }
@@ -81,23 +89,24 @@ namespace SqlBackup
             return restore;
         }
 
-        private RelocateFile Relocate(DataRow? row)
+        private RelocateFile Relocate(DatabaseFileInfo fileInfo)
         {
-            if (row == null)
-            {
-                throw new ArgumentNullException(nameof(row));
-            }
             RelocateFile file = new();
 
-            if ((string)row[1] == "D")
+            switch (fileInfo.FileType)
             {
-                file.LogicalFileName = _destinationDatabaseName;
-                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName + ".mdf");
-            }
-            else
-            {
-                file.LogicalFileName = _destinationDatabaseName + "_log";
-                file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName + "_log.ldf");
+                case FileType.Data:
+                    file.LogicalFileName = _destinationDatabaseName;
+                    file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName + ".mdf");
+                    break;
+
+                case FileType.Log:
+                    file.LogicalFileName = _destinationDatabaseName + "_log";
+                    file.PhysicalFileName = Path.Combine(_server.Settings.DefaultFile, _destinationDatabaseName + "_log.ldf");
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format(Properties.Resources.FileTypeNotSupported, fileInfo.FileType));
             }
             return file;
         }

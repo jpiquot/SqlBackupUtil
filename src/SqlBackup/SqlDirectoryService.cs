@@ -12,8 +12,7 @@ namespace SqlBackup
 {
     public class SqlDirectoryService : IDirectoryService
     {
-        private const string _connectionString = "Initial Catalog = master; Server= %1; Integrated Security = %2;";
-        private const string _query = "EXEC master.sys.xp_dirtree '%1',1,1;";
+        private const string _query = "EXEC master.sys.xp_dirtree '{0}',1,1;";
         private readonly SqlConnection _sqlConnection;
 
         public SqlDirectoryService(SqlConnection sqlConnection)

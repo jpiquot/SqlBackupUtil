@@ -121,13 +121,13 @@
     <value>The argument is null, empty or whitespaces.</value>
   </data>
   <data name="DiffBackupNotFound" xml:space="preserve">
-    <value>No diff backup found from server '%1', for database '%2', before %3.</value>
+    <value>No diff backup found from server '{0}', for database '{1}', before {2}.</value>
   </data>
   <data name="FullBackupNotFound" xml:space="preserve">
-    <value>No full backup found from server '%1', for database '%2', before %3.</value>
+    <value>No full backup found from server '{0}', for database '{1}', before {2}.</value>
   </data>
   <data name="FullNotFoundForDiffBackup" xml:space="preserve">
-    <value>The full backup was not found for differential : %1.</value>
+    <value>The full backup was not found for differential : {0}.</value>
   </data>
   <data name="CorruptDatabaseFileInfo" xml:space="preserve">
     <value>Failed to retrieve database files information.</value>
@@ -136,6 +136,12 @@
     <value>The table contains an invalid column.</value>
   </data>
   <data name="BackupFileTypeUnsupported" xml:space="preserve">
-    <value>The backup file type '%1' not supported.</value>
+    <value>The backup file type '{0}' not supported.</value>
+  </data>
+  <data name="NoBackupFileToRestore" xml:space="preserve">
+    <value>No backup files given for the restore operation.</value>
+  </data>
+  <data name="FileTypeNotSupported" xml:space="preserve">
+    <value>The database file type '{0}' is not supported.</value>
   </data>
 </root>

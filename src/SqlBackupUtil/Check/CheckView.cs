@@ -60,6 +60,10 @@ namespace SqlBackupUtil
 
         protected override void AddTableInformation()
         {
+            if (_tableView == null)
+            {
+                return;
+            }
             _tableView.Items = (from s in _backups orderby s.ServerName, s.DatabaseName, s.StartDate select s).ToList();
 
             _tableView.AddColumn(

@@ -15,18 +15,21 @@ namespace SqlBackupUtil
     {
         protected readonly IEnumerable<TItems> _backups;
         protected readonly TOptions _options;
-        protected readonly TableView<TItems> _tableView;
+        protected readonly TableView<TItems>? _tableView;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="backups">List of backup file headers</param>
         /// <param name="options"></param>
-        public CommandView(IEnumerable<TItems> backups, TOptions options)
+        public CommandView(IEnumerable<TItems>? backups, TOptions options)
         {
             _backups = backups ?? throw new ArgumentNullException(nameof(backups));
             _options = options ?? throw new ArgumentNullException(nameof(options));
-            _tableView = new TableView<TItems>();
+            if (backups.Any())
+            {
+                _tableView = new TableView<TItems>();
+            }
         }
 
         protected TextSpanFormatter Formatter { get; } = new TextSpanFormatter();

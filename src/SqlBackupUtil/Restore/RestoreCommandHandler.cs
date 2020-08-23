@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine.Invocation;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
+using System.Linq;
 
 using Microsoft.Extensions.Options;
 
@@ -35,7 +36,7 @@ namespace SqlBackupUtil
         /// <summary>
         /// Execute the list command
         /// </summary>
-        public void Execute()
+        public int Execute()
         {
             var settings = new BackupStoreSettings
             {
@@ -59,15 +60,21 @@ namespace SqlBackupUtil
                     _ => null
                 });
 
-            var restore = new DatabaseRestore(_options.Server, _options.Database, backups);
-
-            var view = new RestoreView(restore.RelocatedFiles, backups, _options);
+            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console);
+            var restore = backups.Any() ? new DatabaseRestore(_options.Server, _options.Database, backups) : null;
+            var view = new RestoreView(restore?.RelocatedFiles ?? Array.Empty<DatabaseFileInfo>(), backups, _options);
             view.Initialize();
-
-            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = view };
+            screen.Child = view;
             screen.Render();
-
-            restore.Execute();
+            if (restore != null)
+            {
+                restore.Execute();
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
         }
     }
 }
