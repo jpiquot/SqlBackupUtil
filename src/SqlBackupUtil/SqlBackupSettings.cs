@@ -13,6 +13,7 @@ namespace SqlBackupUtil
         public string? Database { get; set; }
         public int? DiffFrequency { get; set; }
         public int? FullFrequency { get; set; }
+        public bool IncludeSubDirectories { get; set; }
         public int? LogFrequency { get; set; }
         public string? Login { get; set; }
         public string? Password { get; set; }

@@ -169,7 +169,7 @@ namespace SqlBackupTest
         [Fact]
         public void GetFileNames_MockAllDirectories_ShouldReturnFiveFiles()
         {
-            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\" } });
+            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\" }, IncludeSubDirectories = true });
 
             var store = new BackupStore(GetServer(), options, GetDirectory());
 
@@ -284,7 +284,8 @@ namespace SqlBackupTest
                                  {
                                      filtered.AddRange(dir
                                          .Where(p =>
-                                            p.StartsWith(path, StringComparison.InvariantCultureIgnoreCase) &&
+                                            ((!recurse && Path.GetDirectoryName(p) == Path.GetDirectoryName(Path.Combine(path, "toto.txt"))) ||
+                                            (recurse && p.StartsWith(path, StringComparison.InvariantCultureIgnoreCase))) &&
                                             p.EndsWith("." + ext, StringComparison.InvariantCultureIgnoreCase)));
                                  }
                              }
@@ -293,6 +294,7 @@ namespace SqlBackupTest
                                  filtered.AddRange(dir.Where(p => p.StartsWith(path, StringComparison.InvariantCultureIgnoreCase)));
                              }
                          }
+                         return filtered;
                      }
                      return dir;
                  }

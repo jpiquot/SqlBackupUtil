@@ -52,7 +52,7 @@ namespace SqlBackup
         public List<BackupDatabaseFile> BackupDatabaseFiles => _backupDatabaseFiles ??= InitBackupDatabaseFiles();
 
         public IEnumerable<string> BackupFiles
-            => _backupFiles ??= _directory.GetFiles(_options.Value.BackupPaths, _options.Value.BackupFileExtensions, true);
+            => _backupFiles ??= _directory.GetFiles(_options.Value.BackupPaths, _options.Value.BackupFileExtensions, _options.Value.IncludeSubDirectories);
 
         public List<BackupHeader> BackupHeaders => _backupHeaders ??= InitBackupHeaders();
         public List<BackupMediaHeader> BackupMediaHeaders => _backupMediaHeaders ??= InitBackupMediaHeaders();

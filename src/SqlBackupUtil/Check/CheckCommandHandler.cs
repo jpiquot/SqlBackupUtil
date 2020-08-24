@@ -28,7 +28,8 @@ namespace SqlBackupUtil
                 Login = _options.Login,
                 Password = _options.Password,
                 BackupFileExtensions = _options.BackupExtensions,
-                BackupPaths = _options.BackupDirectories
+                BackupPaths = _options.BackupDirectories,
+                IncludeSubDirectories = _options.IncludeSubDirectories
             };
             var options = Microsoft.Extensions.Options.Options.Create(settings);
             var store = new BackupStore(_options.Server, options);

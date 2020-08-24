@@ -8,5 +8,6 @@ namespace SqlBackup
         public List<string> BackupPaths { get; set; } = new List<string>();
         public string? Login { get; set; }
         public string? Password { get; set; }
+        public bool IncludeSubDirectories { get; set; }
     }
 }

@@ -10,6 +10,7 @@ namespace SqlBackupUtil
         public List<string> BackupExtensions { get; set; } = new List<string> { "BAK", "TRN" };
         public BackupTypes BackupType { get; set; } = BackupTypes.All;
         public string Command { get; set; } = string.Empty;
+        public bool IncludeSubDirectories { get; set; }
         public string? Login { get; set; }
         public string? Password { get; set; }
         public string Server { get; set; } = "localhost";

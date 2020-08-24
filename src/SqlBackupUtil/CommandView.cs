@@ -40,12 +40,13 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Sql backup utility V{Assembly.GetExecutingAssembly().GetName().Version}".Orange())));
             Add(new ContentView(Span($"Jérôme Piquot".DarkOrange())));
             Add(new ContentView("\n"));
-            Add(new ContentView(Span($"Command:             {string.Join("; ", _options.Command).White()}")));
-            Add(new ContentView(Span($"Sql server:          {string.Join("; ", _options.Server).DarkGrey()}")));
+            Add(new ContentView(Span($"Command:                 {string.Join("; ", _options.Command).White()}")));
+            Add(new ContentView(Span($"Sql server:              {string.Join("; ", _options.Server).DarkGrey()}")));
             Add(new ContentView("\n"));
-            Add(new ContentView(Span($"Backup directories:  {string.Join("; ", _options.BackupDirectories).DarkGrey()}")));
-            Add(new ContentView(Span($"Backup extensions:   {string.Join("; ", _options.BackupExtensions).DarkGrey()}")));
-            Add(new ContentView(Span($"Backup type:         {_options.BackupType.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Backup directories:      {string.Join("; ", _options.BackupDirectories).DarkGrey()}")));
+            Add(new ContentView(Span($"Include sub directories: {_options.IncludeSubDirectories.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Backup extensions:       {string.Join("; ", _options.BackupExtensions).DarkGrey()}")));
+            Add(new ContentView(Span($"Backup type:             {_options.BackupType.ToString().DarkGrey()}")));
             AddSummaryInformation();
             if (_backups.Any())
             {

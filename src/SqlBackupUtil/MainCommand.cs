@@ -23,6 +23,7 @@ namespace SqlBackupUtil
             _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
             AddGlobalOption(new ServerOption(defaultValues));
             AddGlobalOption(new BackupExtensionsOption(defaultValues));
+            AddGlobalOption(new IncludeSubDirectoriesOption(defaultValues));
             AddGlobalOption(new BackupDirectoriesOption(defaultValues));
             AddGlobalOption(new BackupTypeOption(defaultValues));
             AddGlobalOption(new LoginOption(defaultValues));
