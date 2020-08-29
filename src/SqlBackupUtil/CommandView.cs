@@ -47,6 +47,9 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Include sub directories: {_options.IncludeSubDirectories.ToString().DarkGrey()}")));
             Add(new ContentView(Span($"Backup extensions:       {string.Join("; ", _options.BackupExtensions).DarkGrey()}")));
             Add(new ContentView(Span($"Backup type:             {_options.BackupType.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Source server:           {_options.SourceServer?.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Source database:         {_options.SourceDatabase?.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Before:                  {_options.Before?.ToString().DarkGrey()}")));
             AddSummaryInformation();
             if (_backups.Any())
             {

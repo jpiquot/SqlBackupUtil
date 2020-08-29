@@ -30,6 +30,7 @@ namespace SqlBackupUtil
             AddGlobalOption(new PasswordOption(defaultValues));
             AddGlobalOption(new SourceDatabaseOption(defaultValues));
             AddGlobalOption(new SourceServerOption(defaultValues));
+            AddGlobalOption(new BeforeOption(defaultValues));
 
             Command command = new CheckCommand(defaultValues)
             {
@@ -52,7 +53,6 @@ namespace SqlBackupUtil
                         => new ListCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
                 )
             };
-
             AddCommand(command);
             command = new RestoreCommand(defaultValues)
             {

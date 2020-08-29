@@ -46,19 +46,40 @@ namespace SqlBackupUtil
                 IncludeSubDirectories = _options.IncludeSubDirectories
             };
             var store = new BackupStore(_options.Server, Options.Create(settings));
-
-            IEnumerable<BackupHeader>? backups = store.GetBackupHeaders
-                (
-                _options.SourceServer,
-                _options.SourceDatabase,
-                _options.BackupType switch
+            IEnumerable<BackupHeader>? backups;
+            if (_options.LatestOnly)
+            {
+                if (string.IsNullOrWhiteSpace(_options.SourceServer) || string.IsNullOrWhiteSpace(_options.SourceDatabase))
                 {
-                    BackupTypes.Full => BackupType.Full,
-                    BackupTypes.Diff => BackupType.Differential,
-                    BackupTypes.Log => BackupType.Log,
-                    _ => null
-                });
-
+                    throw new InvalidOperationException(SqlBackup.Properties.Resources.SourceRequiredWithLastestOption);
+                }
+                backups = store.GetLatestBackup(
+                    _options.SourceServer,
+                    _options.SourceDatabase,
+                    _options.BackupType switch
+                    {
+                        BackupTypes.Full => BackupType.Full,
+                        BackupTypes.Diff => BackupType.Differential,
+                        BackupTypes.Log => BackupType.Log,
+                        _ => null
+                    },
+                    _options.Before);
+            }
+            else
+            {
+                backups = store.GetBackupHeaders
+                    (
+                    _options.SourceServer,
+                    _options.SourceDatabase,
+                    _options.BackupType switch
+                    {
+                        BackupTypes.Full => BackupType.Full,
+                        BackupTypes.Diff => BackupType.Differential,
+                        BackupTypes.Log => BackupType.Log,
+                        _ => null
+                    },
+                    _options.Before);
+            }
             var list = new ListView(backups, _options);
             list.Initialize();
 

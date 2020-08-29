@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SqlBackupTest": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

@@ -22,8 +22,11 @@ namespace SqlBackupUtil
 
         protected override void AddSummaryInformation()
         {
-            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Latest only:             {_options.LatestOnly.ToString().DarkGrey()}")));
+            if (!_backups.Any())
+            {
+                Add(new ContentView(Span($"\nNo backup files found!".LightRed())));
+            }
         }
 
         protected override void AddTableInformation()

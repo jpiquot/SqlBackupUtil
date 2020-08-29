@@ -8,5 +8,7 @@ namespace SqlBackupUtil
         {
             Command = "LIST";
         }
+
+        public bool LatestOnly { get; set; }
     }
 }

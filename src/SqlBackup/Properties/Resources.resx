@@ -144,4 +144,7 @@
   <data name="FileTypeNotSupported" xml:space="preserve">
     <value>The database file type '{0}' is not supported.</value>
   </data>
+  <data name="SourceRequiredWithLastestOption" xml:space="preserve">
+    <value>Source server and source database options are required when lastest only option is true.</value>
+  </data>
 </root>

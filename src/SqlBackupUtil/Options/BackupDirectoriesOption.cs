@@ -5,9 +5,8 @@ using Microsoft.Extensions.Options;
 namespace SqlBackupUtil
 {
     /// <summary>
-    /// Backup directories Option. Implements the <see cref="Option{Int32}"/>
+    /// Backup directories Option.
     /// </summary>
-    /// <seealso cref="Option{Int32}"/>
     internal class BackupDirectoriesOption : Option<string[]>
     {
         /// <summary>

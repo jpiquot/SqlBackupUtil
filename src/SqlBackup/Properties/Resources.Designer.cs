@@ -22,7 +22,7 @@ namespace SqlBackup.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SqlBackup.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SqlBackup.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace SqlBackup.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The argument is null, empty or whitespaces..
         /// </summary>
-        internal static string ArgumentIsNullOrWhitespace {
+        public static string ArgumentIsNullOrWhitespace {
             get {
                 return ResourceManager.GetString("ArgumentIsNullOrWhitespace", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The backup file type &apos;{0}&apos; not supported..
         /// </summary>
-        internal static string BackupFileTypeUnsupported {
+        public static string BackupFileTypeUnsupported {
             get {
                 return ResourceManager.GetString("BackupFileTypeUnsupported", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve database files information..
         /// </summary>
-        internal static string CorruptDatabaseFileInfo {
+        public static string CorruptDatabaseFileInfo {
             get {
                 return ResourceManager.GetString("CorruptDatabaseFileInfo", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No diff backup found from server &apos;{0}&apos;, for database &apos;{1}&apos;, before {2}..
         /// </summary>
-        internal static string DiffBackupNotFound {
+        public static string DiffBackupNotFound {
             get {
                 return ResourceManager.GetString("DiffBackupNotFound", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The database file type &apos;{0}&apos; is not supported..
         /// </summary>
-        internal static string FileTypeNotSupported {
+        public static string FileTypeNotSupported {
             get {
                 return ResourceManager.GetString("FileTypeNotSupported", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No full backup found from server &apos;{0}&apos;, for database &apos;{1}&apos;, before {2}..
         /// </summary>
-        internal static string FullBackupNotFound {
+        public static string FullBackupNotFound {
             get {
                 return ResourceManager.GetString("FullBackupNotFound", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The full backup was not found for differential : {0}..
         /// </summary>
-        internal static string FullNotFoundForDiffBackup {
+        public static string FullNotFoundForDiffBackup {
             get {
                 return ResourceManager.GetString("FullNotFoundForDiffBackup", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The table contains an invalid column..
         /// </summary>
-        internal static string InvalidColumn {
+        public static string InvalidColumn {
             get {
                 return ResourceManager.GetString("InvalidColumn", resourceCulture);
             }
@@ -135,9 +135,18 @@ namespace SqlBackup.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No backup files given for the restore operation..
         /// </summary>
-        internal static string NoBackupFileToRestore {
+        public static string NoBackupFileToRestore {
             get {
                 return ResourceManager.GetString("NoBackupFileToRestore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source server and source database options are required when lastest only option is true..
+        /// </summary>
+        public static string SourceRequiredWithLastestOption {
+            get {
+                return ResourceManager.GetString("SourceRequiredWithLastestOption", resourceCulture);
             }
         }
     }

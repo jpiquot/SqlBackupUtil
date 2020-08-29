@@ -10,7 +10,7 @@
 		},
 		"List": {
 			"commandName": "Project",
-			"commandLineArgs": "list --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak",
+			"commandLineArgs": "list --backup-directories D:\\Dev\\jpiquot\\SqlBackupUtil\\test\\SqlBackupTest\\Bak --before \"2020-08-03 14:31\" --latest-only true --source-server DESKTOP-NVACFK6 --source-database Test",
 			"sqlDebugging": true,
 			"environmentVariables": {
 				"ASPNETCORE_ENVIRONMENT": "Development"

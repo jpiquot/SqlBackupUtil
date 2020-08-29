@@ -14,7 +14,7 @@ namespace SqlBackupUtil
             : base("list", "List of the existing database backup files.")
         {
             AddAlias("ls");
-            AddOption(new DatabaseOption(defaultValues));
+            AddOption(new LatestOnlyOption(defaultValues));
         }
     }
 }

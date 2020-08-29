@@ -1,5 +1,6 @@
 ﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using System;
 using System.Collections.Generic;
 
 namespace SqlBackupUtil
@@ -9,6 +10,7 @@ namespace SqlBackupUtil
         public List<string> BackupDirectories { get; set; } = new List<string> { @"." };
         public List<string> BackupExtensions { get; set; } = new List<string> { "BAK", "TRN" };
         public BackupTypes BackupType { get; set; } = BackupTypes.All;
+        public DateTime? Before { get; set; }
         public string Command { get; set; } = string.Empty;
         public bool IncludeSubDirectories { get; set; }
         public string? Login { get; set; }
