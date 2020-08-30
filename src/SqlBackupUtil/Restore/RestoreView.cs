@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.CommandLine.Rendering.Views;
 using System.Linq;
 
@@ -12,26 +11,17 @@ namespace SqlBackupUtil
     /// </summary>
     internal class RestoreView : CommandView<BackupHeader, RestoreOptions>
     {
-        private readonly IEnumerable<DatabaseFileInfo> _relocatedFiles;
-        private TableView<DatabaseFileInfo>? _tableView2;
-
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="relocatedFiles"></param>
         /// <param name="backups">List of backup file headers</param>
         /// <param name="options"></param>
-        public RestoreView(IEnumerable<DatabaseFileInfo> relocatedFiles, IEnumerable<BackupHeader> backups, RestoreOptions options)
-            : base(backups, options)
-            => _relocatedFiles = relocatedFiles ?? throw new ArgumentNullException(nameof(relocatedFiles));
+        public RestoreView(IEnumerable<BackupHeader> backups, RestoreOptions options)
+            : base(backups, options) { }
 
         public override void Initialize()
         {
             base.Initialize();
-            if (_relocatedFiles.Any())
-            {
-                AddRelocatedFilesTable();
-            }
             if (!_backups.Any())
             {
                 Add(new ContentView(Span("Error : No backups are defined for the restore operation.".LightRed())));
@@ -40,9 +30,9 @@ namespace SqlBackupUtil
 
         protected override void AddSummaryInformation()
         {
-            Add(new ContentView(Span($"Database:            {(_options.Database ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Database:                {(_options.Database ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Source server:           {(_options.SourceServer ?? "All").DarkGrey()}")));
+            Add(new ContentView(Span($"Source database:         {(_options.SourceDatabase ?? "All").DarkGrey()}")));
         }
 
         protected override void AddTableInformation()
@@ -69,37 +59,14 @@ namespace SqlBackupUtil
             _tableView.AddColumn(
                 cellValue: f => Span(f.FileName),
                 header: new ContentView("Backup file".Underline()));
-        }
 
-        private void AddRelocatedFilesTable()
-        {
-            Add(new ContentView(Span($"\nDatbase Files".Orange())));
-            _tableView2 = new TableView<DatabaseFileInfo>();
-            Add(_tableView2);
-            if (_relocatedFiles.Any())
-            {
-                _tableView2.Items = (from s in _relocatedFiles orderby s.FileId select s).ToList();
+            _tableView.AddColumn(
+                cellValue: f => Span(f.FirstLSN),
+                header: new ContentView("Start LSN".Underline()));
 
-                _tableView2.AddColumn(
-                    cellValue: f => Span(f.FileId),
-                    header: new ContentView("Id".Underline()));
-
-                _tableView2.AddColumn(
-                   cellValue: f => f.FileType == FileType.Data
-                                       ? f.FileType.ToString().LightGreen()
-                                       : f.FileType == FileType.Log
-                                           ? f.FileType.ToString().LightBlue()
-                                           : f.FileType.ToString().White(),
-                   header: new ContentView("Type".Underline()));
-
-                _tableView2.AddColumn(
-                    cellValue: f => Span(f.LogicalName),
-                    header: new ContentView("Name".Underline()));
-
-                _tableView2.AddColumn(
-                    cellValue: f => Span(f.PhysicalName),
-                    header: new ContentView("File".Underline()));
-            }
+            _tableView.AddColumn(
+                cellValue: f => Span(f.LastLSN),
+                header: new ContentView("Last LSN".Underline()));
         }
     }
 }

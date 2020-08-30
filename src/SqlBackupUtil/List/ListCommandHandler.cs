@@ -53,16 +53,11 @@ namespace SqlBackupUtil
                 {
                     throw new InvalidOperationException(SqlBackup.Properties.Resources.SourceRequiredWithLastestOption);
                 }
-                backups = store.GetLatestBackup(
+                backups = store.GetLatestBackupSet(
                     _options.SourceServer,
                     _options.SourceDatabase,
-                    _options.BackupType switch
-                    {
-                        BackupTypes.Full => BackupType.Full,
-                        BackupTypes.Diff => BackupType.Differential,
-                        BackupTypes.Log => BackupType.Log,
-                        _ => null
-                    },
+                    _options.BackupType == BackupTypes.Diff || _options.BackupType == BackupTypes.All,
+                    _options.BackupType == BackupTypes.Log || _options.BackupType == BackupTypes.All,
                     _options.Before);
             }
             else

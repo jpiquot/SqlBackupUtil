@@ -49,21 +49,18 @@ namespace SqlBackupUtil
             var store = new BackupStore(_options.Server, Options.Create(settings));
             _ = _options.SourceServer ?? throw new NotSupportedException("The source server must be defined.");
             _ = _options.SourceDatabase ?? throw new NotSupportedException("The source database must be defined.");
-            IEnumerable<BackupHeader> backups = store.GetLatestBackup
+            IEnumerable<BackupHeader> backups = store.GetLatestBackupSet
                 (
                 _options.SourceServer,
                 _options.SourceDatabase,
-                _options.BackupType switch
-                {
-                    BackupTypes.Full => BackupType.Full,
-                    BackupTypes.Diff => BackupType.Differential,
-                    BackupTypes.Log => BackupType.Log,
-                    _ => null
-                });
+                _options.BackupType == BackupTypes.Diff || _options.BackupType == BackupTypes.All,
+                _options.BackupType == BackupTypes.Log || _options.BackupType == BackupTypes.All,
+                _options.Before
+                );
 
             var screen = new ScreenView(_consoleRenderer, _invocationContext.Console);
             var restore = backups.Any() ? new DatabaseRestore(_options.Server, _options.Database, backups) : null;
-            var view = new RestoreView(restore?.RelocatedFiles ?? Array.Empty<DatabaseFileInfo>(), backups, _options);
+            var view = new RestoreView(backups, _options);
             view.Initialize();
             screen.Child = view;
             screen.Render();

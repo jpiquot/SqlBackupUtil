@@ -39,7 +39,7 @@ namespace SqlBackup
         public decimal? DifferentialBaseLSN => (decimal?)_values[nameof(DifferentialBaseLSN)];
         public byte[]? EncryptorThumbprint => (byte[]?)_values[nameof(EncryptorThumbprint)];
         public string EncryptorType => (string)_values[nameof(EncryptorType)];
-        public DateTime ExpirationDate => (DateTime)_values[nameof(ExpirationDate)];
+        public DateTime? ExpirationDate => (DateTime?)_values[nameof(ExpirationDate)];
         public Guid FamilyGUID => (Guid)_values[nameof(FamilyGUID)];
         public string FileName { get; }
         public decimal FirstLSN => (decimal)_values[nameof(FirstLSN)];

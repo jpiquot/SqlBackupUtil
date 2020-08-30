@@ -70,6 +70,10 @@ namespace SqlBackupUtil
                 header: new ContentView("Checkpoint LSN".Underline()));
 
             _tableView.AddColumn(
+                 cellValue: f => Span(f.LastLSN),
+                 header: new ContentView("Last LSN".Underline()));
+
+            _tableView.AddColumn(
                 cellValue: f => Span(f.FileName),
                 header: new ContentView("Backup file".Underline()));
         }

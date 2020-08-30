@@ -205,7 +205,7 @@ namespace SqlBackupTest
 
             var store = new BackupStore(GetServer(), options);
 
-            IEnumerable<BackupHeader> infos = store.GetLatestDiffWithFull("DESKTOP-NVACFK6", "Test");
+            IEnumerable<BackupHeader> infos = store.GetLatestBackupSet("DESKTOP-NVACFK6", "Test", true, false);
             infos.Should().HaveCount(2);
             BackupHeader info = infos.First();
             info.Should().NotBeNull();
