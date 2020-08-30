@@ -30,6 +30,8 @@ namespace SqlBackup
                 throw new ArgumentException(Properties.Resources.ArgumentIsNullOrWhitespace, nameof(destinationDatabaseName));
             }
             _server = new Server(serverName);
+            _server.ConnectionContext.ConnectTimeout = 5000;
+            _server.ConnectionContext.StatementTimeout = 3600;
             _destinationDatabaseName = destinationDatabaseName;
             _backups = backups ?? throw new ArgumentNullException(nameof(backups));
             _pointInTime = pointInTime;

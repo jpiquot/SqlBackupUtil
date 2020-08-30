@@ -29,6 +29,7 @@ namespace SqlBackupUtil
         public RestoreCommandHandler(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, RestoreOptions options)
         {
             _invocationContext = invocationContext ?? throw new ArgumentNullException(nameof(invocationContext));
+            _ = _invocationContext.Console ?? throw new ArgumentException("Console property is null", nameof(invocationContext));
             _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
