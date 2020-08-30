@@ -78,8 +78,11 @@ namespace SqlBackupUtil
             var list = new ListView(backups, _options);
             list.Initialize();
 
-            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
-            screen.Render();
+            if (!_options.Silent)
+            {
+                var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
+                screen.Render();
+            }
         }
     }
 }

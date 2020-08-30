@@ -31,6 +31,7 @@ namespace SqlBackupUtil
             AddGlobalOption(new SourceDatabaseOption(defaultValues));
             AddGlobalOption(new SourceServerOption(defaultValues));
             AddGlobalOption(new BeforeOption(defaultValues));
+            AddGlobalOption(new SilentOption(defaultValues));
 
             Command command = new CheckCommand(defaultValues)
             {

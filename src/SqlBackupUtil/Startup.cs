@@ -92,7 +92,7 @@ namespace SqlBackupUtil
                 .AddSingleton(_invocationContext)
                 .AddSingleton(p => new ConsoleRenderer(
                         _invocationContext.Console,
-                        OutputMode.Ansi,
+                        OutputMode.PlainText,
                         true))
                 .Configure<SqlBackupSettings>(Configuration.GetSection(nameof(SqlBackupSettings)));
 

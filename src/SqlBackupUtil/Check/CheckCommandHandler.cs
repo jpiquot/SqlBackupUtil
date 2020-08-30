@@ -48,9 +48,11 @@ namespace SqlBackupUtil
 
             var check = new CheckView(backups, _options);
             check.Initialize();
-
-            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
-            screen.Render();
+            if (!_options.Silent)
+            {
+                var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
+                screen.Render();
+            }
             return (check.HasErrors) ? -1 : 0;
         }
     }

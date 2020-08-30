@@ -199,13 +199,13 @@ namespace SqlBackupTest
         }
 
         [Fact]
-        public void GetLatestDiffWithFull_ReturnFull1Diff2()
+        public void GetLatestBefore03_08_2020_15h_ReturnFull1Diff2()
         {
             IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { Path.Combine(AppContext.BaseDirectory, "Bak") } });
 
             var store = new BackupStore(GetServer(), options);
 
-            IEnumerable<BackupHeader> infos = store.GetLatestBackupSet("DESKTOP-NVACFK6", "Test", true, false);
+            IEnumerable<BackupHeader> infos = store.GetLatestBackupSet("DESKTOP-NVACFK6", "Test", true, false, new DateTime(2020, 8, 3, 15, 0, 0));
             infos.Should().HaveCount(2);
             BackupHeader info = infos.First();
             info.Should().NotBeNull();

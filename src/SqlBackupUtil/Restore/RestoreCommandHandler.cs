@@ -58,12 +58,15 @@ namespace SqlBackupUtil
                 _options.Before
                 );
 
-            var screen = new ScreenView(_consoleRenderer, _invocationContext.Console);
             var restore = backups.Any() ? new DatabaseRestore(_options.Server, _options.Database, backups) : null;
             var view = new RestoreView(backups, _options);
             view.Initialize();
-            screen.Child = view;
-            screen.Render();
+            if (!_options.Silent)
+            {
+                var screen = new ScreenView(_consoleRenderer, _invocationContext.Console);
+                screen.Child = view;
+                screen.Render();
+            }
             if (restore != null)
             {
                 restore.Execute();

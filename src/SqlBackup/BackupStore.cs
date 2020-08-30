@@ -37,7 +37,7 @@ namespace SqlBackup
             {
                 ServerInstance = serverName
             };
-            if (login != null)
+            if (!string.IsNullOrWhiteSpace(login))
             {
                 con.LoginSecure = false;
                 con.Authentication = SqlConnectionInfo.AuthenticationMethod.SqlPassword;

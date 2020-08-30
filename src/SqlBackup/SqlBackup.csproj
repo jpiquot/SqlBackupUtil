@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.0" />
 		<PackageReference Include="Dapper" Version="2.0.35" />
 		<PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="161.42121.15-msdata" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.7" />

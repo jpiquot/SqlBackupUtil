@@ -24,7 +24,7 @@ namespace SqlBackup
         {
             SqlConnectionStringBuilder builder = new();
             builder.DataSource = serverName;
-            if (login == null)
+            if (string.IsNullOrWhiteSpace(login))
             {
                 builder.IntegratedSecurity = true;
             }
