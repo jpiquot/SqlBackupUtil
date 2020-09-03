@@ -4,5 +4,6 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
 		<Version>0.1.0-preview</Version>
+		<AnalysisLevel>latest</AnalysisLevel>
 	</PropertyGroup>
 </Project>
