@@ -8,7 +8,7 @@ namespace SqlBackupUtil
     /// Backup type Option. Implements the <see cref="Option{Int32}"/>
     /// </summary>
     /// <seealso cref="Option{Int32}"/>
-    internal class BackupTypeOption : Option<BackupTypes>
+    internal class BackupTypeOption : Option<BackupRestoreType>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BackupTypeOption"/> class.
@@ -17,7 +17,7 @@ namespace SqlBackupUtil
         public BackupTypeOption(IOptions<SqlBackupSettings> defaultValues)
             : base(
                   new[] { "--backup-type", "-bt" },
-                  () => defaultValues.Value.BackupType ?? BackupTypes.All,
+                  () => defaultValues.Value.BackupType ?? BackupRestoreType.All,
                   "The backup files type.")
         {
         }

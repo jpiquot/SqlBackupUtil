@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
+using System.Globalization;
 using System.Linq;
 
 using SqlBackup;
@@ -28,11 +29,11 @@ namespace SqlBackupUtil
         {
             Add(new ContentView(Span($"Source server:       {(_options.SourceServer ?? "All").DarkGrey()}")));
             Add(new ContentView(Span($"Source database:     {(_options.SourceDatabase ?? "All").DarkGrey()}")));
-            Add(new ContentView(Span($"Full frequency:      {(_options.FullFrequency).ToString().DarkGrey()}")));
-            Add(new ContentView(Span($"Diff frequency:      {(_options.DiffFrequency).ToString().DarkGrey()}")));
-            Add(new ContentView(Span($"Log frequency:       {(_options.LogFrequency).ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Full frequency:      {(_options.FullFrequency).ToString(CultureInfo.CurrentCulture).DarkGrey()}")));
+            Add(new ContentView(Span($"Diff frequency:      {(_options.DiffFrequency).ToString(CultureInfo.CurrentCulture).DarkGrey()}")));
+            Add(new ContentView(Span($"Log frequency:       {(_options.LogFrequency).ToString(CultureInfo.CurrentCulture).DarkGrey()}")));
 
-            if (_options.BackupType == BackupTypes.Full || _options.BackupType == BackupTypes.All)
+            if (_options.BackupType == BackupRestoreType.Full || _options.BackupType == BackupRestoreType.All)
             {
                 if (!_backups.Any(p => p.BackupType == BackupType.Full))
                 {
@@ -40,7 +41,7 @@ namespace SqlBackupUtil
                     Add(new ContentView(Span($"Full backup missing!".LightRed())));
                 }
             }
-            if (_options.BackupType == BackupTypes.Diff || _options.BackupType == BackupTypes.All)
+            if (_options.BackupType == BackupRestoreType.Diff || _options.BackupType == BackupRestoreType.All)
             {
                 if (!_backups.Any(p => p.BackupType == BackupType.Differential))
                 {
@@ -48,7 +49,7 @@ namespace SqlBackupUtil
                     Add(new ContentView(Span($"Differential backup missing!".LightRed())));
                 }
             }
-            if (_options.BackupType == BackupTypes.Log || _options.BackupType == BackupTypes.All)
+            if (_options.BackupType == BackupRestoreType.Log || _options.BackupType == BackupRestoreType.All)
             {
                 if (!_backups.Any(p => p.BackupType == BackupType.Log))
                 {

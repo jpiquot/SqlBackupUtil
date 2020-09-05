@@ -26,7 +26,7 @@ namespace SqlBackup
         public List<BackupMediaHeader> BackupMediaHeaders => _backupMediaHeaders ??= InitBackupMediaHeaders();
         public Restore Restore => _restore ??= InitRestore();
 
-        private List<T> CreateList<T>(DataTable table, Func<Dictionary<string, object>, T> create)
+        private static List<T> CreateList<T>(DataTable table, Func<Dictionary<string, object>, T> create)
         {
             var list = new List<T>(table.Rows.Count);
             foreach (DataRow? row in table.Rows)

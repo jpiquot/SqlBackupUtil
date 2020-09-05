@@ -38,13 +38,13 @@ namespace SqlBackupUtil
         public void Execute()
         {
             var settings = new BackupStoreSettings
-            {
-                Login = _options.Login,
-                Password = _options.Password,
-                BackupFileExtensions = _options.BackupExtensions,
-                BackupPaths = _options.BackupDirectories,
-                IncludeSubDirectories = _options.IncludeSubDirectories
-            };
+            (
+                _options.BackupExtensions,
+                _options.BackupDirectories,
+                _options.Login,
+                _options.Password,
+                _options.IncludeSubDirectories
+            );
             var store = new BackupStore(_options.Server, Options.Create(settings));
             IEnumerable<BackupHeader>? backups;
             if (_options.LatestOnly)
@@ -56,21 +56,21 @@ namespace SqlBackupUtil
                 backups = store.GetLatestBackupSet(
                     _options.SourceServer,
                     _options.SourceDatabase,
-                    _options.BackupType == BackupTypes.Diff || _options.BackupType == BackupTypes.All,
-                    _options.BackupType == BackupTypes.Log || _options.BackupType == BackupTypes.All,
+                    _options.BackupType == BackupRestoreType.Diff || _options.BackupType == BackupRestoreType.All,
+                    _options.BackupType == BackupRestoreType.Log || _options.BackupType == BackupRestoreType.All,
                     _options.Before);
             }
             else
             {
-                backups = store.GetBackupHeaders
+                backups = store.GetBackups
                     (
                     _options.SourceServer,
                     _options.SourceDatabase,
                     _options.BackupType switch
                     {
-                        BackupTypes.Full => BackupType.Full,
-                        BackupTypes.Diff => BackupType.Differential,
-                        BackupTypes.Log => BackupType.Log,
+                        BackupRestoreType.Full => BackupType.Full,
+                        BackupRestoreType.Diff => BackupType.Differential,
+                        BackupRestoreType.Log => BackupType.Log,
                         _ => null
                     },
                     _options.Before);
@@ -80,7 +80,7 @@ namespace SqlBackupUtil
 
             if (!_options.Silent)
             {
-                var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
+                using var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
                 screen.Render();
             }
         }

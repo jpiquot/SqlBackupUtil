@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace SqlBackup
 {
@@ -30,9 +32,18 @@ namespace SqlBackup
         public decimal? ReadOnlyLSN => (decimal?)_values[nameof(ReadOnlyLSN)];
         public decimal? ReadWriteLSN => (decimal?)_values[nameof(ReadWriteLSN)];
         public long Size => (long)_values[nameof(Size)];
-        public string? SnapshotURL => (string?)_values[nameof(SnapshotURL)];
+
+        public Uri? SnapshotURL
+        {
+            get
+            {
+                string? url = (string?)_values[nameof(SnapshotURL)];
+                return url == null ? null : new Uri(url);
+            }
+        }
+
         public int SourceBlockSize => (int)_values[nameof(SourceBlockSize)];
-        public byte[]? TDEThumbprint => (byte[]?)_values[nameof(TDEThumbprint)];
+        public ReadOnlyCollection<byte> TDEThumbprint => new ReadOnlyCollection<byte>((byte[])(_values[nameof(TDEThumbprint)] ?? Array.Empty<byte>()));
         public Guid UniqueId => (Guid)_values[nameof(UniqueId)];
         public Dictionary<string, object> Values => new Dictionary<string, object>(_values);
 
@@ -42,7 +53,7 @@ namespace SqlBackup
             "L" => FileType.Log,
             "F" => FileType.FullText,
             "S" => FileType.Stream,
-            _ => throw new NotSupportedException(string.Format(Properties.Resources.BackupFileTypeUnsupported, type))
+            _ => throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.BackupFileTypeUnsupported, type))
         };
     }
 }

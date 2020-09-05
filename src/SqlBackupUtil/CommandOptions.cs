@@ -9,7 +9,7 @@ namespace SqlBackupUtil
     {
         public List<string> BackupDirectories { get; set; } = new List<string> { @"." };
         public List<string> BackupExtensions { get; set; } = new List<string> { "BAK", "TRN" };
-        public BackupTypes BackupType { get; set; } = BackupTypes.All;
+        public BackupRestoreType BackupType { get; set; } = BackupRestoreType.All;
         public DateTime? Before { get; set; }
         public string Command { get; set; } = string.Empty;
         public bool IncludeSubDirectories { get; set; }

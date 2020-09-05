@@ -1,13 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SqlBackup
 {
     public class BackupStoreSettings
     {
-        public List<string> BackupFileExtensions { get; set; } = new List<string>();
-        public List<string> BackupPaths { get; set; } = new List<string>();
-        public string? Login { get; set; }
-        public string? Password { get; set; }
-        public bool IncludeSubDirectories { get; set; }
+        public BackupStoreSettings()
+        {
+            BackupFileExtensions = new List<string>();
+            BackupPaths = new List<string>();
+        }
+
+        public BackupStoreSettings(List<string> backupFileExtensions, List<string> backupPaths, string? login, string? password, bool includeSubDirectories)
+        {
+            BackupFileExtensions = backupFileExtensions;
+            BackupPaths = backupPaths;
+            Login = login;
+            Password = password;
+            IncludeSubDirectories = includeSubDirectories;
+        }
+
+        public List<string> BackupFileExtensions { get; }
+        public List<string> BackupPaths { get; }
+        public bool IncludeSubDirectories { get; }
+        public string? Login { get; }
+        public string? Password { get; }
     }
 }

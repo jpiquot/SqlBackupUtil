@@ -9,13 +9,16 @@ namespace SqlBackup
         public static Dictionary<string, object> ToDictionary(this DataRow row)
         {
             var values = new Dictionary<string, object>();
-            foreach (DataColumn? column in row.Table.Columns)
+            if (row != null)
             {
-                if (column == null)
+                foreach (DataColumn? column in row.Table.Columns)
                 {
-                    throw new InvalidDataException(Properties.Resources.InvalidColumn);
+                    if (column == null)
+                    {
+                        throw new InvalidDataException(Properties.Resources.InvalidColumn);
+                    }
+                    values.Add(column.ColumnName, row[column.Ordinal]);
                 }
-                values.Add(column.ColumnName, row[column.Ordinal]);
             }
             return values;
         }

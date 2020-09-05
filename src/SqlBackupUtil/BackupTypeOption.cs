@@ -2,7 +2,7 @@
 
 namespace SqlBackupUtil
 {
-    public enum BackupTypes
+    public enum BackupRestoreType
     {
         All,
         Full,

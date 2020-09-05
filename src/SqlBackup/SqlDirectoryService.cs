@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,10 +11,12 @@ using Microsoft.Data.SqlClient;
 
 namespace SqlBackup
 {
-    public class SqlDirectoryService : IDirectoryService
+    public class SqlDirectoryService : IDirectoryService, IDisposable
     {
         private const string _query = "EXEC master.sys.xp_dirtree '{0}',1,1;";
         private readonly SqlConnection _sqlConnection;
+
+        private bool isDisposed;
 
         public SqlDirectoryService(SqlConnection sqlConnection)
         {
@@ -38,9 +41,15 @@ namespace SqlBackup
             _sqlConnection = new SqlConnection(builder.ConnectionString);
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public Task<IEnumerable<SqlDirTree>> GetDirectoryContentAsync(string path)
-            => _sqlConnection
-                .QueryAsync<SqlDirTree>(string.Format(_query, path));
+                    => _sqlConnection
+                .QueryAsync<SqlDirTree>(string.Format(CultureInfo.InvariantCulture, _query, path));
 
         public IEnumerable<string> GetFiles(IEnumerable<string> paths, IEnumerable<string> extensions, bool recursive = false)
             => GetFilesAsync(paths, extensions, recursive).GetAwaiter().GetResult();
@@ -48,25 +57,44 @@ namespace SqlBackup
         public async Task<IEnumerable<string>> GetFilesAsync(IEnumerable<string> paths, IEnumerable<string> extensions, bool recursive = false)
         {
             List<string> list = new();
-            foreach (string path in paths)
+            if (paths?.Any() == true && extensions?.Any() == true)
             {
-                IEnumerable<SqlDirTree>? content = await GetDirectoryContentAsync(path);
-                foreach (string extension in extensions)
+                foreach (string path in paths)
                 {
-                    list.AddRange(content
-                        .Where(p => p.File == true && p.SubDirectory.ToUpperInvariant().EndsWith("." + extension))
-                        .Select(p => Path.Combine(path, p.SubDirectory)));
-                }
-                if (recursive)
-                {
-                    list.AddRange(await GetFilesAsync(content
-                                .Where(p => p.File == false)
-                                .Select(p => Path.Combine(path, p.SubDirectory)),
-                                extensions, recursive)
-                                );
+                    IEnumerable<SqlDirTree>? content = await GetDirectoryContentAsync(path);
+                    foreach (string extension in extensions)
+                    {
+                        list.AddRange(content
+                            .Where(p => p.File == true && p.SubDirectory.ToUpperInvariant().EndsWith("." + extension, StringComparison.InvariantCultureIgnoreCase))
+                            .Select(p => Path.Combine(path, p.SubDirectory)));
+                    }
+                    if (recursive)
+                    {
+                        list.AddRange(await GetFilesAsync(content
+                                    .Where(p => p.File == false)
+                                    .Select(p => Path.Combine(path, p.SubDirectory)),
+                                    extensions, recursive)
+                                    );
+                    }
                 }
             }
             return list;
+        }
+
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (isDisposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _sqlConnection.Dispose();
+            }
+
+            isDisposed = true;
         }
     }
 }

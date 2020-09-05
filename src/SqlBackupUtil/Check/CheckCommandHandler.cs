@@ -24,25 +24,24 @@ namespace SqlBackupUtil
         public int Execute()
         {
             var settings = new BackupStoreSettings
-            {
-                Login = _options.Login,
-                Password = _options.Password,
-                BackupFileExtensions = _options.BackupExtensions,
-                BackupPaths = _options.BackupDirectories,
-                IncludeSubDirectories = _options.IncludeSubDirectories
-            };
-            var options = Microsoft.Extensions.Options.Options.Create(settings);
-            var store = new BackupStore(_options.Server, options);
+            (
+                _options.BackupExtensions,
+                _options.BackupDirectories,
+                _options.Login,
+                _options.Password,
+                _options.IncludeSubDirectories
+            );
+            var store = new BackupStore(_options.Server, Microsoft.Extensions.Options.Options.Create(settings));
 
-            IEnumerable<BackupHeader>? backups = store.GetBackupHeaders
+            IEnumerable<BackupHeader>? backups = store.GetBackups
                 (
                 _options.SourceServer,
                 _options.SourceDatabase,
                 _options.BackupType switch
                 {
-                    BackupTypes.Full => BackupType.Full,
-                    BackupTypes.Diff => BackupType.Differential,
-                    BackupTypes.Log => BackupType.Log,
+                    BackupRestoreType.Full => BackupType.Full,
+                    BackupRestoreType.Diff => BackupType.Differential,
+                    BackupRestoreType.Log => BackupType.Log,
                     _ => null
                 });
 
@@ -50,7 +49,7 @@ namespace SqlBackupUtil
             check.Initialize();
             if (!_options.Silent)
             {
-                var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
+                using var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
                 screen.Render();
             }
             return (check.HasErrors) ? -1 : 0;

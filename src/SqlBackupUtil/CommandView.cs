@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -49,7 +50,7 @@ namespace SqlBackupUtil
             Add(new ContentView(Span($"Backup type:             {_options.BackupType.ToString().DarkGrey()}")));
             Add(new ContentView(Span($"Source server:           {_options.SourceServer?.ToString().DarkGrey()}")));
             Add(new ContentView(Span($"Source database:         {_options.SourceDatabase?.ToString().DarkGrey()}")));
-            Add(new ContentView(Span($"Before:                  {_options.Before?.ToString().DarkGrey()}")));
+            Add(new ContentView(Span($"Before:                  {_options.Before?.ToString(CultureInfo.CurrentCulture).DarkGrey()}")));
             AddSummaryInformation();
             if (_backups.Any())
             {

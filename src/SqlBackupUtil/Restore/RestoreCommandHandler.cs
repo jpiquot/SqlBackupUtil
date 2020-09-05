@@ -40,13 +40,13 @@ namespace SqlBackupUtil
         public int Execute()
         {
             var settings = new BackupStoreSettings
-            {
-                Login = _options.Login,
-                Password = _options.Password,
-                BackupFileExtensions = _options.BackupExtensions,
-                BackupPaths = _options.BackupDirectories,
-                IncludeSubDirectories = _options.IncludeSubDirectories
-            };
+            (
+                _options.BackupExtensions,
+                _options.BackupDirectories,
+                _options.Login,
+                _options.Password,
+                _options.IncludeSubDirectories
+            );
             var store = new BackupStore(_options.Server, Options.Create(settings));
             _ = _options.SourceServer ?? throw new NotSupportedException("The source server must be defined.");
             _ = _options.SourceDatabase ?? throw new NotSupportedException("The source database must be defined.");
@@ -54,8 +54,8 @@ namespace SqlBackupUtil
                 (
                 _options.SourceServer,
                 _options.SourceDatabase,
-                _options.BackupType == BackupTypes.Diff || _options.BackupType == BackupTypes.All,
-                _options.BackupType == BackupTypes.Log || _options.BackupType == BackupTypes.All,
+                _options.BackupType == BackupRestoreType.Diff || _options.BackupType == BackupRestoreType.All,
+                _options.BackupType == BackupRestoreType.Log || _options.BackupType == BackupRestoreType.All,
                 _options.Before
                 );
 
@@ -64,7 +64,7 @@ namespace SqlBackupUtil
             view.Initialize();
             if (!_options.Silent)
             {
-                var screen = new ScreenView(_consoleRenderer, _invocationContext.Console);
+                using var screen = new ScreenView(_consoleRenderer, _invocationContext.Console);
                 screen.Child = view;
                 screen.Render();
             }

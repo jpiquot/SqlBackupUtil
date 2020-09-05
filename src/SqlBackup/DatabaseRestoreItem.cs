@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 
 using Microsoft.SqlServer.Management.Smo;
@@ -97,7 +98,7 @@ namespace SqlBackup
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format(Properties.Resources.FileTypeNotSupported, fileInfo.FileType));
+                    throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.FileTypeNotSupported, fileInfo.FileType));
             }
             return file;
         }

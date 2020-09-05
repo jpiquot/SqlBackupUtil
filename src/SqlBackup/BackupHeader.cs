@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace SqlBackup
 {
@@ -37,7 +38,7 @@ namespace SqlBackup
         public DeviceType DeviceType => (DeviceType)(byte)_values[nameof(DeviceType)];
         public Guid? DifferentialBaseGUID => (Guid?)_values[nameof(DifferentialBaseGUID)];
         public decimal? DifferentialBaseLSN => (decimal?)_values[nameof(DifferentialBaseLSN)];
-        public byte[]? EncryptorThumbprint => (byte[]?)_values[nameof(EncryptorThumbprint)];
+        public ReadOnlyCollection<byte>? EncryptorThumbprint => new ReadOnlyCollection<byte>((byte[])(_values[nameof(EncryptorThumbprint)] ?? Array.Empty<byte>()));
         public string EncryptorType => (string)_values[nameof(EncryptorType)];
         public DateTime? ExpirationDate => (DateTime?)_values[nameof(ExpirationDate)];
         public Guid FamilyGUID => (Guid)_values[nameof(FamilyGUID)];

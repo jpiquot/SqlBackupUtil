@@ -169,7 +169,14 @@ namespace SqlBackupTest
         [Fact]
         public void GetFileNames_MockAllDirectories_ShouldReturnFiveFiles()
         {
-            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings { BackupFileExtensions = { "BAK" }, BackupPaths = { @"C:\" }, IncludeSubDirectories = true });
+            IOptions<BackupStoreSettings> options = Options.Create(new BackupStoreSettings
+            (
+                new List<string> { "BAK" },
+                new List<string> { @"C:\" },
+                null,
+                null,
+                true
+            ));
 
             var store = new BackupStore(GetServer(), options, GetDirectory());
 

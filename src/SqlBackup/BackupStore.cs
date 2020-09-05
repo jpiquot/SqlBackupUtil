@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 
 using Microsoft.Extensions.Options;
@@ -28,6 +29,7 @@ namespace SqlBackup
 
         public BackupStore(string serverName, IOptions<BackupStoreSettings> options, IDirectoryService? directory = null)
         {
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             if (string.IsNullOrWhiteSpace(serverName))
             {
                 throw new ArgumentException(Properties.Resources.ArgumentIsNullOrWhitespace, nameof(serverName));
@@ -45,7 +47,6 @@ namespace SqlBackup
                 con.Password = options.Value.Password;
             }
             _server = new Server(con);
-            _options = options ?? throw new ArgumentNullException(nameof(options));
             _directory = directory ?? new SqlDirectoryService(serverName, options.Value.Login, options.Value.Password);
         }
 
@@ -59,7 +60,7 @@ namespace SqlBackup
 
         public int FullBackupCount(string serverName, string databaseName) => GetFullBackupHeaders(serverName, databaseName).Count();
 
-        public IEnumerable<BackupHeader> GetBackupHeaders(string? serverName, string? databaseName, BackupType? type = null, DateTime? before = null)
+        public IEnumerable<BackupHeader> GetBackups(string? serverName, string? databaseName, BackupType? type = null, DateTime? before = null)
             => BackupHeaders.Where(p =>
                 (type == null || p.BackupType == type) &&
                 (string.IsNullOrEmpty(databaseName) || p.DatabaseName == databaseName) &&
@@ -72,30 +73,18 @@ namespace SqlBackup
             .ToList();
 
         public IEnumerable<BackupHeader> GetDiffBackupHeaders(string? serverName, string? databaseName)
-            => GetBackupHeaders(serverName, databaseName, BackupType.Differential);
+            => GetBackups(serverName, databaseName, BackupType.Differential);
 
         public IEnumerable<BackupHeader> GetFullBackupHeaders(string? serverName, string? databaseName, DateTime? before = null)
-            => GetBackupHeaders(serverName, databaseName, BackupType.Full, before);
-
-        public BackupHeader GetFullForDiff(BackupHeader diff)
-        {
-            BackupHeader? full = GetFullBackupHeaders(diff.ServerName, diff.DatabaseName, diff.StartDate)
-                .Where(p => p.CheckpointLSN == diff.DatabaseBackupLSN)
-                .FirstOrDefault();
-            if (full == null)
-            {
-                throw new ApplicationException(string.Format(Properties.Resources.FullNotFoundForDiffBackup, diff.FileName));
-            }
-            return full;
-        }
+            => GetBackups(serverName, databaseName, BackupType.Full, before);
 
         public BackupHeader GetLatestBackup(string serverName, string databaseName, bool includeDifferentials = true, bool includeLogs = false, DateTime? before = null)
-            => GetBackupHeaders(serverName, databaseName, null, before)
+            => GetBackups(serverName, databaseName, null, before)
                 .Where(p => p.BackupType == BackupType.Full ||
                                 (includeDifferentials && p.BackupType == BackupType.Differential) ||
                                 (includeLogs && p.BackupType == BackupType.Log))
                 .FirstOrDefault()
-            ?? throw new ApplicationException(string.Format(Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
+            ?? throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
 
         public IEnumerable<BackupHeader> GetLatestBackupSet(string serverName, string databaseName, bool includeDifferentials = true, bool includeLogs = false, DateTime? before = null)
         {
@@ -114,25 +103,25 @@ namespace SqlBackup
             => GetFullBackupHeaders(serverName, databaseName, before)
                 .OrderByDescending(p => p.CheckpointLSN)
                 .FirstOrDefault()
-            ?? throw new ApplicationException(string.Format(Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
+            ?? throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
 
         public BackupHeader GetLatestFullOrDiff(string serverName, string databaseName, DateTime? before = null)
         {
             BackupHeader? full = GetLatestFull(serverName, databaseName, before);
-            BackupHeader? diff = GetBackupHeaders(serverName, databaseName, null, before)
+            BackupHeader? diff = GetBackups(serverName, databaseName, null, before)
                 .Where(p => p.BackupType == BackupType.Differential && p.StartDate > full.StartDate)
                 .FirstOrDefault();
-            return diff ?? full ?? throw new ApplicationException(string.Format(Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
+            return diff ?? full ?? throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FullBackupNotFound, serverName, databaseName, before ?? DateTime.Now));
         }
 
         public IEnumerable<BackupHeader> GetLogBackupHeaders(string? serverName, string? databaseName)
-            => GetBackupHeaders(serverName, databaseName, BackupType.Log);
+            => GetBackups(serverName, databaseName, BackupType.Log);
 
         private IEnumerable<BackupHeader> GetAllForLog(BackupHeader latestBackup)
         {
             var backups = new List<BackupHeader>();
             var latestDiffOrFull = GetLatestFullOrDiff(latestBackup.ServerName, latestBackup.DatabaseName, latestBackup.StartDate);
-            IEnumerable<BackupHeader>? logs = GetBackupHeaders(latestBackup.ServerName, latestBackup.DatabaseName, BackupType.Log, latestBackup.StartDate)
+            IEnumerable<BackupHeader>? logs = GetBackups(latestBackup.ServerName, latestBackup.DatabaseName, BackupType.Log, latestBackup.StartDate)
                 .Where(p => p.StartDate > latestDiffOrFull.StartDate);
             if (latestDiffOrFull.BackupType == BackupType.Differential)
             {
@@ -141,6 +130,18 @@ namespace SqlBackup
             backups.Add(latestDiffOrFull);
             backups.AddRange(logs);
             return backups;
+        }
+
+        private BackupHeader GetFullForDiff(BackupHeader diff)
+        {
+            BackupHeader? full = GetFullBackupHeaders(diff.ServerName, diff.DatabaseName, diff.StartDate)
+                .Where(p => p.CheckpointLSN == diff.DatabaseBackupLSN)
+                .FirstOrDefault();
+            if (full == null)
+            {
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.FullNotFoundForDiffBackup, diff.FileName));
+            }
+            return full;
         }
 
         private List<BackupDatabaseFile> InitBackupDatabaseFiles()
