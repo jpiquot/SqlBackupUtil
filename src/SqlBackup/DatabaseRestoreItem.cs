@@ -13,6 +13,7 @@ namespace SqlBackup
         private readonly BackupHeader _backup;
         private readonly string _destinationDatabaseName;
         private readonly bool _last;
+        private readonly DateTime? _pointInTime;
         private readonly Server _server;
         private IEnumerable<DatabaseFileInfo>? _relocatedFiles;
         private Restore? _restore;
@@ -23,7 +24,7 @@ namespace SqlBackup
         /// <param name="serverName"></param>
         /// <param name="destinationDatabaseName"></param>
         /// <param name="backup"></param>
-        public DatabaseRestoreItem(Server server, string destinationDatabaseName, BackupHeader backup, bool last)
+        public DatabaseRestoreItem(Server server, string destinationDatabaseName, BackupHeader backup, DateTime? pointInTime, bool last)
         {
             if (string.IsNullOrWhiteSpace(destinationDatabaseName))
             {
@@ -32,6 +33,7 @@ namespace SqlBackup
             _server = server ?? throw new ArgumentNullException(nameof(server));
             _destinationDatabaseName = destinationDatabaseName;
             _backup = backup ?? throw new ArgumentNullException(nameof(backup));
+            _pointInTime = pointInTime;
             _last = last;
         }
 
@@ -44,7 +46,10 @@ namespace SqlBackup
         public void Execute()
         {
             Restore.Wait();
-
+            if (_pointInTime != null)
+            {
+                Restore.ToPointInTime = _pointInTime.ToSqlString();
+            }
             Restore.SqlRestore(_server);
         }
 

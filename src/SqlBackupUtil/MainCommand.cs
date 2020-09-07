@@ -1,8 +1,8 @@
-﻿using System;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.CommandLine.Rendering;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace SqlBackupUtil
@@ -13,14 +13,9 @@ namespace SqlBackupUtil
     /// <seealso cref="System.CommandLine.RootCommand"/>
     internal class MainCommand : RootCommand
     {
-        private readonly ConsoleRenderer _consoleRenderer;
-        private readonly InvocationContext _invocationContext;
-
-        public MainCommand(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, IOptions<SqlBackupSettings> defaultValues)
+        public MainCommand(IOptions<SqlBackupSettings> defaultValues)
             : base("Sql Server Backup Utility")
         {
-            _invocationContext = invocationContext ?? throw new ArgumentNullException(nameof(invocationContext));
-            _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
             AddGlobalOption(new ServerOption(defaultValues));
             AddGlobalOption(new BackupExtensionsOption(defaultValues));
             AddGlobalOption(new IncludeSubDirectoriesOption(defaultValues));
@@ -35,36 +30,47 @@ namespace SqlBackupUtil
 
             Command command = new CheckCommand(defaultValues)
             {
-                Handler =
-                CommandHandler.Create<CheckOptions>
-                (
-                    (options)
-                        => new CheckCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
-                )
+                Handler = CommandHandler.Create<IHost, CheckOptions>((host, options) =>
+                {
+                    new CheckCommandHandler(
+                            host.Services,
+                            options
+                        )
+                        .InvokeAsync(host.Services.GetRequiredService<InvocationContext>())
+                        .GetAwaiter()
+                        .GetResult();
+                })
             };
-
             AddCommand(command);
 
             command = new ListCommand(defaultValues)
             {
-                Handler =
-                CommandHandler.Create<ListOptions>
-                (
-                    (options)
-                        => new ListCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
-                )
+                Handler = CommandHandler.Create<IHost, ListOptions>((host, options) =>
+                {
+                    new ListCommandHandler(
+                            host.Services,
+                            options
+                        )
+                        .InvokeAsync(host.Services.GetRequiredService<InvocationContext>())
+                        .GetAwaiter()
+                        .GetResult();
+                })
             };
             AddCommand(command);
+
             command = new RestoreCommand(defaultValues)
             {
-                Handler =
-                CommandHandler.Create<RestoreOptions>
-                (
-                    (options)
-                        => new RestoreCommandHandler(_invocationContext, _consoleRenderer, options).Execute()
-                )
+                Handler = CommandHandler.Create<IHost, RestoreOptions>((host, options) =>
+                {
+                    new RestoreCommandHandler(
+                            host.Services,
+                            options
+                        )
+                        .InvokeAsync(host.Services.GetRequiredService<InvocationContext>())
+                        .GetAwaiter()
+                        .GetResult();
+                })
             };
-
             AddCommand(command);
         }
     }

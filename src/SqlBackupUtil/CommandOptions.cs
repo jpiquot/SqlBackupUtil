@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Generic;
 
+using SqlBackup;
+
 namespace SqlBackupUtil
 {
     internal abstract class CommandOptions
@@ -19,5 +21,14 @@ namespace SqlBackupUtil
         public bool Silent { get; set; }
         public string? SourceDatabase { get; set; }
         public string? SourceServer { get; set; }
+
+        public BackupStoreSettings GetBackupStoreSettings() => new BackupStoreSettings
+            (
+                BackupExtensions,
+                BackupDirectories,
+                Login,
+                Password,
+                IncludeSubDirectories
+            );
     }
 }

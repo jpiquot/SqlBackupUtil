@@ -3,6 +3,7 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Invocation;
+using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.CommandLine.Rendering;
 using System.IO;
@@ -11,7 +12,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using NLog.Extensions.Logging;
+using NLog.Web;
 
 namespace SqlBackupUtil
 {
@@ -48,18 +53,22 @@ namespace SqlBackupUtil
             }
             return new CommandLineBuilder(
                 new MainCommand(
-                        _invocationContext,
-                        _consoleRenderer,
                         Options.Create
                         (
                             GetSettings()
                         )))
                 .UseDefaults()
-                .UseHost(_ => Host
-                    .CreateDefaultBuilder()
+                .UseHost(host => host
                     .ConfigureAppConfiguration((builder) => Configure(builder))
                     .ConfigureHostConfiguration((builder) => Configure(builder))
-                    .ConfigureServices((services) => ConfigureServices(services)))
+                    .ConfigureServices((services) => ConfigureServices(services))
+                    .ConfigureLogging(logging =>
+                    {
+                        logging.ClearProviders();
+                        logging.SetMinimumLevel(LogLevel.Trace);
+                    })
+                    .UseNLog()
+                )
                 .Build()
                 .InvokeAsync(_args ?? Array.Empty<string>(), _invocationContext.Console);
         }
@@ -89,11 +98,19 @@ namespace SqlBackupUtil
         private IServiceCollection ConfigureServices(IServiceCollection services)
             => services
                 .AddOptions()
+                .AddSingleton<IConsole, SystemConsole>()
                 .AddSingleton(_invocationContext)
                 .AddSingleton(p => new ConsoleRenderer(
                         _invocationContext.Console,
-                        OutputMode.PlainText,
+                        OutputMode.Ansi,
                         true))
+                .AddLogging(loggingBuilder =>
+                {
+                    loggingBuilder.AddNLog();
+                })
+                .AddTransient<ListCommandHandler>()
+                .AddTransient<CheckCommandHandler>()
+                .AddTransient<RestoreCommandHandler>()
                 .Configure<SqlBackupSettings>(Configuration.GetSection(nameof(SqlBackupSettings)));
 
         private IServiceProvider ConfigureServices()

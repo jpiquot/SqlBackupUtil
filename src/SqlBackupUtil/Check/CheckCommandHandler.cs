@@ -1,43 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.CommandLine.Invocation;
-using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
+using System.Threading.Tasks;
 
 using SqlBackup;
 
+#pragma warning disable CA1812 // Internal class that is apparently never instantiated.
+
 namespace SqlBackupUtil
 {
-    internal class CheckCommandHandler
+    internal class CheckCommandHandler : CommandHandler<CheckCommandHandler, CheckOptions>
     {
-        private readonly ConsoleRenderer _consoleRenderer;
-        private readonly InvocationContext _invocationContext;
-        private readonly CheckOptions _options;
-
-        public CheckCommandHandler(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, CheckOptions options)
+        public CheckCommandHandler(IServiceProvider serviceProvider, CheckOptions options) : base(serviceProvider, options)
         {
-            _invocationContext = invocationContext ?? throw new ArgumentNullException(nameof(invocationContext));
-            _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
-            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public int Execute()
+        public override Task<int> InvokeAsync(InvocationContext context)
         {
-            var settings = new BackupStoreSettings
-            (
-                _options.BackupExtensions,
-                _options.BackupDirectories,
-                _options.Login,
-                _options.Password,
-                _options.IncludeSubDirectories
-            );
-            var store = new BackupStore(_options.Server, Microsoft.Extensions.Options.Options.Create(settings));
+            var store = new BackupStore(Options.Server, Microsoft.Extensions.Options.Options.Create(Options.GetBackupStoreSettings()));
 
             IEnumerable<BackupHeader>? backups = store.GetBackups
                 (
-                _options.SourceServer,
-                _options.SourceDatabase,
-                _options.BackupType switch
+                Options.SourceServer,
+                Options.SourceDatabase,
+                Options.BackupType switch
                 {
                     BackupRestoreType.Full => BackupType.Full,
                     BackupRestoreType.Diff => BackupType.Differential,
@@ -45,14 +32,15 @@ namespace SqlBackupUtil
                     _ => null
                 });
 
-            var check = new CheckView(backups, _options);
+            var check = new CheckView(backups, Options);
             check.Initialize();
-            if (!_options.Silent)
+            if (!Options.Silent)
             {
-                using var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = check };
+                _ = context.Console ?? throw new ArgumentException("Console property is null", nameof(context));
+                using var screen = new ScreenView(ConsoleRenderer, context.Console) { Child = check };
                 screen.Render();
             }
-            return (check.HasErrors) ? -1 : 0;
+            return Task.FromResult((check.HasErrors) ? -1 : 0);
         }
     }
 }

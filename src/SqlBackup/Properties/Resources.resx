@@ -147,4 +147,13 @@
   <data name="SourceRequiredWithLastestOption" xml:space="preserve">
     <value>Source server and source database options are required when lastest only option is true.</value>
   </data>
+  <data name="KillAllDatabaseProcesses" xml:space="preserve">
+    <value>Kill all database '{0}' processes. </value>
+  </data>
+  <data name="DatabaseRestoreEnd" xml:space="preserve">
+    <value>[{1}]:Restore of '{0}' database finished in {2}H{3}mn{4}s.</value>
+  </data>
+  <data name="DatabaseRestoreStart" xml:space="preserve">
+    <value>[{1}]:Starting restore of database '{0}'.</value>
+  </data>
 </root>

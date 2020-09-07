@@ -1,88 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.CommandLine.Invocation;
-using System.CommandLine.Rendering;
 using System.CommandLine.Rendering.Views;
-
-using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 using SqlBackup;
+
+#pragma warning disable CA1812 // Internal class that is apparently never instantiated.
 
 namespace SqlBackupUtil
 {
     /// <summary>
     /// Handle the list command
     /// </summary>
-    internal class ListCommandHandler
+    internal class ListCommandHandler : CommandHandler<ListCommandHandler, ListOptions>
     {
-        private readonly ConsoleRenderer _consoleRenderer;
-        private readonly InvocationContext _invocationContext;
-        private readonly ListOptions _options;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="invocationContext">The invocation context</param>
-        /// <param name="consoleRenderer"></param>
-        /// <param name="options">Command options</param>
-        public ListCommandHandler(InvocationContext invocationContext, ConsoleRenderer consoleRenderer, ListOptions options)
+        public ListCommandHandler(IServiceProvider serviceProvider, ListOptions options) : base(serviceProvider, options)
         {
-            _invocationContext = invocationContext ?? throw new ArgumentNullException(nameof(invocationContext));
-            _consoleRenderer = consoleRenderer ?? throw new ArgumentNullException(nameof(consoleRenderer));
-            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        /// <summary>
-        /// Execute the list command
-        /// </summary>
-        public void Execute()
+        public override Task<int> InvokeAsync(InvocationContext context)
         {
-            var settings = new BackupStoreSettings
-            (
-                _options.BackupExtensions,
-                _options.BackupDirectories,
-                _options.Login,
-                _options.Password,
-                _options.IncludeSubDirectories
-            );
-            var store = new BackupStore(_options.Server, Options.Create(settings));
+            var store = new BackupStore(Options.Server, Microsoft.Extensions.Options.Options.Create(Options.GetBackupStoreSettings()));
             IEnumerable<BackupHeader>? backups;
-            if (_options.LatestOnly)
+            if (Options.LatestOnly)
             {
-                if (string.IsNullOrWhiteSpace(_options.SourceServer) || string.IsNullOrWhiteSpace(_options.SourceDatabase))
+                if (string.IsNullOrWhiteSpace(Options.SourceServer) || string.IsNullOrWhiteSpace(Options.SourceDatabase))
                 {
                     throw new InvalidOperationException(SqlBackup.Properties.Resources.SourceRequiredWithLastestOption);
                 }
                 backups = store.GetLatestBackupSet(
-                    _options.SourceServer,
-                    _options.SourceDatabase,
-                    _options.BackupType == BackupRestoreType.Diff || _options.BackupType == BackupRestoreType.All,
-                    _options.BackupType == BackupRestoreType.Log || _options.BackupType == BackupRestoreType.All,
-                    _options.Before);
+                    Options.SourceServer,
+                    Options.SourceDatabase,
+                    Options.BackupType == BackupRestoreType.Diff || Options.BackupType == BackupRestoreType.All,
+                    Options.BackupType == BackupRestoreType.Log || Options.BackupType == BackupRestoreType.All,
+                    Options.Before);
             }
             else
             {
                 backups = store.GetBackups
                     (
-                    _options.SourceServer,
-                    _options.SourceDatabase,
-                    _options.BackupType switch
+                    Options.SourceServer,
+                    Options.SourceDatabase,
+                    Options.BackupType switch
                     {
                         BackupRestoreType.Full => BackupType.Full,
                         BackupRestoreType.Diff => BackupType.Differential,
                         BackupRestoreType.Log => BackupType.Log,
                         _ => null
                     },
-                    _options.Before);
+                    Options.Before);
             }
-            var list = new ListView(backups, _options);
+            var list = new ListView(backups, Options);
             list.Initialize();
 
-            if (!_options.Silent)
+            if (!Options.Silent)
             {
-                using var screen = new ScreenView(_consoleRenderer, _invocationContext.Console) { Child = list };
+                _ = context.Console ?? throw new ArgumentException("Console property is null", nameof(context));
+                using var screen = new ScreenView(ConsoleRenderer, context.Console) { Child = list };
                 screen.Render();
             }
+            return Task.FromResult(0);
         }
     }
 }

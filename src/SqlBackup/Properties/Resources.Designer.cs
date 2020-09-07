@@ -88,6 +88,24 @@ namespace SqlBackup.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [{1}]:Restore of &apos;{0}&apos; database finished in {2}H{3}mn{4}s..
+        /// </summary>
+        public static string DatabaseRestoreEnd {
+            get {
+                return ResourceManager.GetString("DatabaseRestoreEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [{1}]:Starting restore of database &apos;{0}&apos;..
+        /// </summary>
+        public static string DatabaseRestoreStart {
+            get {
+                return ResourceManager.GetString("DatabaseRestoreStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No diff backup found from server &apos;{0}&apos;, for database &apos;{1}&apos;, before {2}..
         /// </summary>
         public static string DiffBackupNotFound {
@@ -129,6 +147,15 @@ namespace SqlBackup.Properties {
         public static string InvalidColumn {
             get {
                 return ResourceManager.GetString("InvalidColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kill all database &apos;{0}&apos; processes. .
+        /// </summary>
+        public static string KillAllDatabaseProcesses {
+            get {
+                return ResourceManager.GetString("KillAllDatabaseProcesses", resourceCulture);
             }
         }
         
