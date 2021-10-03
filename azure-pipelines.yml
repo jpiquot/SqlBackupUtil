@@ -37,21 +37,17 @@ stages:
           version: 5.0.401
           installationPath: $(Agent.ToolsDirectory)/dotnet
       - task: DotNetCoreCLI@2
-        displayName: 'dotnet restore'
+        displayName: 'Restore - $(Configuration)'
         inputs:
           command: 'restore'
+          arguments: '--configuration $(Configuration)'
           projects: $(projects)
           includeNuGetOrg: true
-      - script: |
-                echo "Old build number: $(Build.BuildNumber)"
-                dotnet build $(projects) --configuration $(Configuration)
-                echo "New build number: $(Build.BuildNumber)"
-        displayName: Build projects and update pipeline build number
       - task: DotNetCoreCLI@2
         condition: false
-        displayName: 'Test - $(Configuration)'
+        displayName: 'Build - $(Configuration)'
         inputs:
-          command: 'test'
+          command: build
           arguments: '--configuration $(Configuration)'
           projects: $(projects)
       - task: DotNetCoreCLI@2
