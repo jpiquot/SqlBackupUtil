@@ -44,7 +44,6 @@ stages:
           projects: $(projects)
           includeNuGetOrg: true
       - task: DotNetCoreCLI@2
-        condition: false
         displayName: 'Build - $(Configuration)'
         inputs:
           command: build
