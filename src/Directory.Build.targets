@@ -1,7 +1,7 @@
 <Project>
 	<Target Name="DevOpsVersionTarget" AfterTargets="MinVer">
 		<PropertyGroup>
-			<BUILD_BUILD_NUMBER Condition="'$(BUILD_BUILD_NUMBER)' != ''">$(Version)</BUILD_BUILD_NUMBER>
+			<BUILD_BUILDID Condition="'$(BUILD_BUILDID)' != ''">$(Version)</BUILD_BUILDID>
 		</PropertyGroup>
 	</Target>
 </Project>
