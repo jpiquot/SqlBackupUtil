@@ -36,7 +36,13 @@ stages:
           packageType: sdk
           version: 5.0.401
           installationPath: $(Agent.ToolsDirectory)/dotnet
-      - task: DotNetCoreCLI@2
+    - task: DotNetCoreCLI@2
+        displayName: 'dotnet restore'
+        inputs:
+          command: 'restore'
+          projects: '**/*.csproj'
+          includeNuGetOrg: true
+    - task: DotNetCoreCLI@2
         displayName: 'Build solution - $(Configuration)'
         inputs:
           command: 'build'
