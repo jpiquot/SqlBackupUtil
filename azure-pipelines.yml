@@ -54,8 +54,6 @@ stages:
           command: 'test'
           arguments: '--configuration $(Configuration)'
           projects: $(projects)
-        env:
-          BUILD_BUILDNUMBER:      
       - task: DotNetCoreCLI@2
         displayName: 'Pack - $(Configuration)'
         inputs:
