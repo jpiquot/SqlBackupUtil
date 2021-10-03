@@ -8,8 +8,8 @@ trigger:
     include:
     - v*
 variables:
-    - name: solution
-      value: './SqlBackupUtil.sln'
+    - name: projects
+      value: './src/**/*.csproj'
     - name: binFiles
       value: './SqlBackupUtil/bin/$(Configuration)'
     - group: SqlBackupUtil
@@ -40,27 +40,27 @@ stages:
         displayName: 'dotnet restore'
         inputs:
           command: 'restore'
-          projects: '**/*.csproj'
+          projects: $(projects)
           includeNuGetOrg: true
       - task: DotNetCoreCLI@2
-        displayName: 'Build solution - $(Configuration)'
+        displayName: 'Build projects - $(Configuration)'
         inputs:
           command: 'build'
           arguments: '--configuration $(Configuration)'
-          projects: $(solution)
+          projects: $(projects)
       - task: DotNetCoreCLI@2
         condition: false
         displayName: 'Test - $(Configuration)'
         inputs:
           command: 'test'
           arguments: '--configuration $(Configuration)'
-          projects: $(solution)      
+          projects: $(projects)      
       - task: DotNetCoreCLI@2
         displayName: 'Pack - $(Configuration)'
         inputs:
           command: 'pack'
           arguments: '--configuration $(Configuration)'
-          packagesToPack: $(solution)
+          packagesToPack: $(projects)
           nobuild: true
           versioningScheme: 'off'
       - task: CopyFiles@2
