@@ -8,9 +8,12 @@ trigger:
     include:
     - v*
 variables:
-    - solution: './SqlBackupUtil.sln'
-    - binFiles: './SqlBackupUtil/bin/$(Configuration)'
-    - group: SqlBackup
+    - name: solution
+      value: './SqlBackupUtil.sln'
+    - name: binFiles
+      value: './SqlBackupUtil/bin/$(Configuration)'
+    - group: SqlBackupUtil
+ 
 stages:
 - stage: Build
   jobs:
