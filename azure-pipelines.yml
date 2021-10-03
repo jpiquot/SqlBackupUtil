@@ -12,7 +12,7 @@ variables:
       value: './SqlBackupUtil.sln'
     - name: binFiles
       value: './SqlBackupUtil/bin/$(Configuration)'
-    - group: SqlBackup
+    - group: SqlBackupUtil
  
 stages:
 - stage: Build
