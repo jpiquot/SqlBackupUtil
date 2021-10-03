@@ -73,29 +73,6 @@ stages:
           script: 'echo "##vso[build.addbuildtag]release'
           workingDirectory: '$(Build.ArtifactStagingDirectory)'
 
-- stage: 'PublishPrereleaseNuGetPackage'
-  displayName: 'Publish Prerelease NuGet Package'
-  dependsOn: 'Build'
-  condition: succeeded()
-  jobs:
-  - job:
-    pool:
-      vmImage: 'ubuntu-latest'
-
-    steps:
-    - checkout: none
-
-    - download: current
-      artifact: 'debug'
-
-    - task: NuGetCommand@2
-      displayName: 'Push stable packages to Myget.org prerelease feed'
-      inputs:
-        command: 'push'
-        packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
-        nuGetFeedType: 'external'
-        publishFeedCredentials: 'MyGet'
-
 - stage: 'PublishReleaseNuGetPackage'
   displayName: 'Publish Release NuGet Package'
   dependsOn: 'Build'
