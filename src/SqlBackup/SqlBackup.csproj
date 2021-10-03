@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-	  <NeutralLanguage>en-US</NeutralLanguage>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<Description>
+			This client library enables restoring backups on Microsoft SQL Servers.
+		</Description>
+		<PackageId>Fiveforty.SqlBackup</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.1" />
@@ -8,8 +12,8 @@
 		<PackageReference Include="Microsoft.SqlServer.SqlManagementObjects" Version="161.46437.65" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
 		<PackageReference Include="MinVer" Version="2.5.0">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>

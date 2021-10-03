@@ -10,4 +10,13 @@
 		<MinVerTagPrefix>v</MinVerTagPrefix>
 		<MinVerDefaultPreReleasePhase>preview</MinVerDefaultPreReleasePhase>
 	</PropertyGroup>
+	<PropertyGroup Label="Package">
+		<Authors>Jérôme Piquot</Authors>
+		<Company>Fiveforty</Company>
+		<PackageTags>Microsoft SQL Server;Backup;Restore;C#</PackageTags>
+		<PackageProjectUrl>https://github.com/jpiquot/SqlBackupUtil</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/jpiquot/SqlBackupUtil.git</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
 </Project>

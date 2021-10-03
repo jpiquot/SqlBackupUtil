@@ -4,6 +4,12 @@
 		<OutputType>Exe</OutputType>
 		<UserSecretsId>94ac5083-4126-40fd-95a3-637b0af9cee8</UserSecretsId>
 		<IncludeSymbolsInSingleFile>true</IncludeSymbolsInSingleFile>
+		<Description>
+			This CLI tool enables restoring backups on Microsoft SQL Servers.
+		</Description>
+		<PackageId>Fiveforty.SqlBackup-CLI</PackageId>
+		<ToolCommandName>sqlbackup</ToolCommandName>
+		<PackAsTool>true</PackAsTool>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="appsettings.development.json" />
@@ -23,8 +29,8 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="MinVer" Version="3.0.0-alpha.1">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
 		<PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
