@@ -8,11 +8,11 @@ trigger:
     include:
     - v*
 variables:
-    - name: projects
-      value: 'src/**/*.csproj'
-    - name: binFiles
-      value: 'src/SqlBackupUtil/bin/$(Configuration)'
-    - group: SqlBackupUtil
+  - name: projects
+    value: 'src/**/*.csproj'
+  - name: binFiles
+    value: 'src/SqlBackupUtil/bin/$(Configuration)'
+  - group: SqlBackupUtil
  
 stages:
 - stage: Build
