@@ -14,13 +14,13 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
+steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
     command: 'restore'
     projects: '**/*.csproj'
     includeNuGetOrg: true
-
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
