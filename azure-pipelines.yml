@@ -9,7 +9,7 @@ trigger:
     - v*
 variables:
     - name: projects
-      value: './src/**/*.csproj'
+      value: 'src/**/*.csproj'
     - name: binFiles
       value: './SqlBackupUtil/bin/$(Configuration)'
     - group: SqlBackupUtil
