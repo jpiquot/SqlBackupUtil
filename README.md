@@ -3,7 +3,7 @@
 The goal of this SQL Server backup utility, is to automate backup/restore operations for project environments using Azure DevOps pipelines or Windows scheduler.
 
 [![Join the chat at https://gitter.im/SqlBackupUtil/community](https://badges.gitter.im/SqlBackupUtil/community.svg)](https://gitter.im/SqlBackupUtil/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2--Clause-blue.svg)](LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT--Clause-blue.svg)](LICENSE)
 [![Documentation](https://readthedocs.org/projects/sqlbackuputil/badge/)](https://sqlbackuputil.readthedocs.io/en/latest/) [![Join the chat at https://gitter.im/SqlBackupUtil/backup](https://badges.gitter.im/SqlBackupUtil/backup.svg)](https://gitter.im/SqlBackupUtil/backup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Status
