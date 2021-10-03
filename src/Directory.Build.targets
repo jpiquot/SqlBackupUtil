@@ -1,7 +1,6 @@
 <Project>
 	<Target Name="DevOpsVersionTarget" AfterTargets="MinVer">
-		<PropertyGroup>
-			<Build_BuildNumber>$(Version)</Build_BuildNumber>
-		</PropertyGroup>
+		<Message Text="Update build number with version : $(Version)" Importance="high"/>
+		<Message Text="##vso[build.updatebuildnumber]$(Version)" Importance="high"/>
 	</Target>
 </Project>
