@@ -11,7 +11,7 @@ variables:
     - name: projects
       value: 'src/**/*.csproj'
     - name: binFiles
-      value: './SqlBackupUtil/bin/$(Configuration)'
+      value: 'src/SqlBackupUtil/bin/$(Configuration)'
     - group: SqlBackupUtil
  
 stages:
