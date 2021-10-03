@@ -92,6 +92,7 @@ stages:
          - checkout: none
          - download: current
            artifact: 'release'
+         - task: NuGetAuthenticate@0
          - task: NuGetCommand@2
            displayName: 'Push stable packages to NuGet.org feed'
            inputs:
