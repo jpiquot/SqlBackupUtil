@@ -45,9 +45,10 @@ stages:
       - script: |
                 echo "Old build number: $(Build.BuildNumber)"
                 dotnet build $(projects) --configuration $(Configuration)
-                echo "##vso[build.updatebuildnumber]Release $(Version)"
-                echo "Version number: $(Build.BuildNumber)-($Rev)"
+                echo "##vso[build.updatebuildnumber]$(Version)"
+                echo "Version number: $(Version)"
                 echo "New build number: $(Build.BuildNumber)"
+                set
         displayName: Build projects and update pipeline build number
       - task: DotNetCoreCLI@2
         condition: false
