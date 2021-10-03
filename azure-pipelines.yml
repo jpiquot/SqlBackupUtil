@@ -43,10 +43,11 @@ stages:
           projects: $(projects)
           includeNuGetOrg: true
       - script: |
-                echo "$(Build.BuildNumber)"
+                echo "Old build number: $(Build.BuildNumber)"
                 dotnet build $(projects) --configuration $(Configuration)
                 echo "##vso[build.updatebuildnumber]Release $(Version)"
-                echo "$(Build.BuildNumber)"
+                echo "Version number: $(Build.BuildNumber)-($Rev)"
+                echo "New build number: $(Build.BuildNumber)"
         displayName: Build projects and update pipeline build number
       - task: DotNetCoreCLI@2
         condition: false
