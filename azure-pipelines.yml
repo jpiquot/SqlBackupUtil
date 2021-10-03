@@ -44,7 +44,7 @@ stages:
           includeNuGetOrg: true
       - script: |
                 echo "$(Build.BuildNumber)"
-                dotnet build $(projects) -configuration $(Configuration)
+                dotnet build $(projects) --configuration $(Configuration)
                 echo "##vso[build.updatebuildnumber]Release $(Version)"
                 echo "$(Build.BuildNumber)"
         displayName: Build projects and update pipeline build number
