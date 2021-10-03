@@ -42,19 +42,21 @@ stages:
           command: 'restore'
           projects: $(projects)
           includeNuGetOrg: true
-      - task: DotNetCoreCLI@2
-        displayName: 'Build projects - $(Configuration)'
-        inputs:
-          command: 'build'
-          arguments: '--configuration $(Configuration)'
-          projects: $(projects)
+      - script: |
+                echo "$(Build.BuildNumber)"
+                dotnet build $(projects) -configuration $(Configuration)
+                echo "##vso[build.updatebuildnumber]Release $(Version)"
+                echo "$(Build.BuildNumber)"
+        displayName: Build projects and update pipeline build number
       - task: DotNetCoreCLI@2
         condition: false
         displayName: 'Test - $(Configuration)'
         inputs:
           command: 'test'
           arguments: '--configuration $(Configuration)'
-          projects: $(projects)      
+          projects: $(projects)
+        env:
+          BUILD_BUILDNUMBER:      
       - task: DotNetCoreCLI@2
         displayName: 'Pack - $(Configuration)'
         inputs:
